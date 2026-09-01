@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken";
+const jwt=require("jsonwebtoken");
 
-export const protect = async (req, res, next) => {
+const protect = async (req, res, next) => {
     try {
         // Get token from Authorization header
         const authHeader = req.headers.authorization;
@@ -51,3 +51,5 @@ export const protect = async (req, res, next) => {
         });
     }
 };
+
+module.exports = { protect };

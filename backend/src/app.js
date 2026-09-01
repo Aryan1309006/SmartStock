@@ -14,6 +14,7 @@ app.use(cookieparser());
 
 
 app.use("/api/auth",require('./routes/auth.route'))
+app.use("/api",require('./routes/items.route'))
 // app.use('/api/')
 
 module.exports = app;

@@ -116,7 +116,30 @@ const login = async (req, res) => {
   }
 };
 
- const logout = async (req, res) => {
+const getme = (req, res) => {
+  try {
+    const user = user.findById(req.user.userId).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    console.error("Get Me Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const logout = async (req, res) => {
   try {
     // If JWT is stored in an HTTP-only cookie,
     // clear it here.
@@ -140,4 +163,4 @@ const login = async (req, res) => {
   }
 };
 
-module.exports={register,login,logout}
+module.exports = { register, login,getme, logout };
