@@ -10,7 +10,7 @@ const itemSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     category: {
       type: String,
-      enum: ["Pantry", "Medicine", "Toiletries", "Cleaning", "Other"],
+      enum: ["Pantry", "Dairy", "Medicine", "Toiletries", "Cleaning", "Other"],
       required: true,
     },
     quantity: { type: Number, required: true, min: 1 },
@@ -27,3 +27,5 @@ const itemSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+module.exports = mongoose.model("Item", itemSchema);

@@ -27,7 +27,7 @@ npm install
 ```
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret_key
-PORT=5000
+PORT=3000
 ```
 
 4. Start the server:
@@ -43,14 +43,14 @@ The server will run with nodemon for automatic restarts during development.
 
 ### Base URL
 ```
-http://localhost:5000/api
+http://localhost:3000/api
 ```
 
 ---
 
 ## Authentication Endpoints
 
-Base URL: `http://localhost:5000/api/auth`
+Base URL: `http://localhost:3000/api/auth`
 
 ### 1. Register User
 - **Endpoint**: `POST /api/auth/register`
@@ -146,9 +146,51 @@ Base URL: `http://localhost:5000/api/auth`
 
 ---
 
+## Dashboard Endpoints
+
+Base URL: `http://localhost:3000/api`
+
+All dashboard endpoints require authentication (JWT token).
+
+### Get Dashboard Statistics
+- **Endpoint**: `GET /api/dashboard`
+- **Description**: Retrieve inventory dashboard statistics including total items, fresh items, consumed items, expiring items, expired items, and total inventory value
+- **Authentication**: Required (JWT token)
+- **Success Response** (200):
+```json
+{
+  "success": true,
+  "data": {
+    "totalItems": 10,
+    "freshItems": 7,
+    "consumedItems": 2,
+    "expiringItems": 1,
+    "expiredItems": 0,
+    "inventoryValue": 125.50
+  }
+}
+```
+- **Error Response** (500):
+```json
+{
+  "success": false,
+  "message": "Internal server error"
+}
+```
+
+**Dashboard Metrics Explanation**:
+- **totalItems**: Total number of items in user's inventory
+- **freshItems**: Items that are active and not expiring within 7 days
+- **consumedItems**: Items marked as consumed
+- **expiringItems**: Items expiring within the next 7 days
+- **expiredItems**: Items that have already expired
+- **inventoryValue**: Total monetary value of all items (price × quantity)
+
+---
+
 ## Items Endpoints
 
-Base URL: `http://localhost:5000/api`
+Base URL: `http://localhost:3000/api`
 
 All items endpoints require authentication (JWT token).
 
@@ -386,12 +428,12 @@ Standard error response format:
 - `_id`: MongoDB ObjectId
 - `userId`: String (reference to User, required)
 - `name`: String (required)
-- `category`: String (required)
+- `category`: String (required) - Valid values: 'Pantry', 'Dairy', 'Medicine', 'Toiletries', 'Cleaning', 'Other'
 - `purchaseDate`: Date (required)
 - `expiryDate`: Date (required)
 - `price`: Number (required, must be > 0)
 - `quantity`: Number (default: 1)
-- `status`: String (required) - e.g., 'active', 'consumed'
+- `status`: String (required) - Valid values: 'active', 'consumed', 'expired'
 - `notes`: String (optional)
 - `createdAt`: Date
 - `updatedAt`: Date
@@ -410,16 +452,18 @@ backend/
     ├── config/
     │   └── db.js          # Database connection
     ├── controllers/
-    │   ├── authController.js      # Auth logic
-    │   └── itemsController.js     # Items logic
+    │   ├── authController.js         # Auth logic
+    │   ├── itemsController.js        # Items CRUD logic
+    │   └── dashboardController.js    # Dashboard statistics
     ├── middleware/
     │   └── authMiddleware.js      # JWT verification
     ├── models/
     │   ├── user.js        # User schema
     │   └── item.js        # Item schema
     └── routes/
-        ├── auth.route.js   # Auth endpoints
-        └── items.route.js  # Items endpoints
+        ├── auth.route.js      # Auth endpoints
+        ├── items.route.js     # Items endpoints
+        └── dashboard.route.js # Dashboard endpoints
 ```
 
 ---
@@ -431,7 +475,86 @@ To start the development server:
 npm start
 ```
 
-The server will run on the port specified in your `.env` file (default: 5000) and automatically restart when files change thanks to Nodemon.
+The server will run on the port specified in your `.env` file (default: 3000) and automatically restart when files change thanks to Nodemon.
+
+---
+
+## Debugging & Fixed Issues
+
+This section documents all issues found and fixed during the development process:
+
+### 1. **Typo in Function Name (authController.js)**
+- **Issue**: Function was declared as `generetToken` but called as `generateToken`
+- **Error**: `generateToken is not a function`
+- **Fix**: Renamed function to `generateToken` (corrected typo)
+
+### 2. **Variable Shadowing (authController.js)**
+- **Issue**: In `getme()` function, `const user = user.findById()` shadowed the User model
+- **Error**: `TypeError: user.findById is not a function`
+- **Fix**: Changed to `const user = User.findById()` (capital U)
+
+### 3. **Async/Await Missing (authController.js)**
+- **Issue**: `getme()` function was not declared as async but used await
+- **Error**: Returned promise instead of user data
+- **Fix**: Added `async` keyword to function declaration
+
+### 4. **Wrong Model Import (dashboardController.js)**
+- **Issue**: Imported `../models/itemModel` which doesn't exist
+- **Error**: `Module not found`
+- **Fix**: Changed to `../models/item`
+
+### 5. **Variable Name Mismatch (dashboardController.js)**
+- **Issue**: Variable declared as `sevenDay` but used as `sevenDaysLater`
+- **Error**: `sevenDaysLater is not defined`
+- **Fix**: Changed usage to `sevenDay`
+
+### 6. **Wrong Field Names (dashboardController.js)**
+- **Issue**: Used `user: userId` instead of `userId: userId` in queries
+- **Error**: Queries returned no results
+- **Fix**: Changed to `userId: userId` to match schema
+
+### 7. **Missing Model Export (item.js)**
+- **Issue**: Item schema defined but never exported
+- **Error**: `Cannot import Item model`
+- **Fix**: Added `module.exports = mongoose.model("Item", itemSchema);`
+
+### 8. **Assignment to Const Variable (authController.js)**
+- **Issue**: Declared `const { email }` but tried to reassign: `email = email.trim().toLowerCase()`
+- **Error**: `TypeError: Assignment to constant variable`
+- **Fix**: Changed `const` to `let` in destructuring
+
+### 9. **Missing Authentication Middleware (auth.route.js)**
+- **Issue**: `/api/auth/me` and `/api/auth/logout` endpoints missing `protect` middleware
+- **Error**: `Cannot read properties of undefined (reading 'userId')`
+- **Fix**: Imported and added `protect` middleware to protected routes
+
+### 10. **Invalid Category Enum (item.js)**
+- **Issue**: Item model enum only had `["Pantry", "Medicine", "Toiletries", "Cleaning", "Other"]` but "Dairy" was used in examples
+- **Error**: `Dairy is not a valid enum value for path category`
+- **Fix**: Added "Dairy" to the enum array
+
+### 11. **Database Connection Not Awaited (index.js)**
+- **Issue**: `connectToDB()` called without await, server started before MongoDB connection
+- **Error**: `Connection refused` on all POST requests
+- **Fix**: Made `startServer()` async and awaited `connectToDB()` before starting the server
+
+### 12. **Route Order Conflict (app.js)**
+- **Issue**: Dashboard route registered after items route, `/api/dashboard` matched `/:id` pattern first
+- **Error**: `CastError: Cast to ObjectId failed for value "dashboard"`
+- **Fix**: Moved dashboard route registration before items routes
+
+### 13. **Deprecation Warnings (itemsController.js)**
+- **Issue**: Used deprecated `{ new: true }` option in `findByIdAndUpdate()` calls
+- **Warning**: `mongoose: the new option for findOneAndUpdate() is deprecated`
+- **Fix**: Replaced with `{ returnDocument: 'after' }` in 3 places:
+  - `updateOne()` function
+  - `markConsume()` function
+  - `restore()` function
+
+### 14. **Schema Validation Issue (user.js)**
+- **Issue**: Used `require: true` instead of `required: true` in schema fields
+- **Error**: Validation not enforced properly
+- **Fix**: Changed all `require` to `required` in User schema
 
 ---
 

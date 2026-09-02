@@ -2,7 +2,7 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const generetToken = (userId) => {
+const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
@@ -10,11 +10,11 @@ const generetToken = (userId) => {
 
 const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    let { name, email, password } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({
-        sucess: false,
-        massage: "Incomplete cradiential",
+        success: false,
+        message: "Incomplete credential",
       });
     }
     email = email.trim().toLowerCase();
@@ -33,7 +33,7 @@ const register = async (req, res) => {
       email,
       password: hashPassword,
     });
-    const token = generetToken(user._id);
+    const token = generateToken(user._id);
     return res.status(201).json({
       success: true,
       message: "User registered successfully",
@@ -116,9 +116,9 @@ const login = async (req, res) => {
   }
 };
 
-const getme = (req, res) => {
+const getme = async (req, res) => {
   try {
-    const user = user.findById(req.user.userId).select("-password");
+    const user = await User.findById(req.user.userId).select("-password");
     if (!user) {
       return res.status(404).json({
         success: false,

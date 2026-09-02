@@ -112,7 +112,7 @@ const showOne = async (req, res) => {
 const updateOne = async (req, res) => {
   try {
     const item = await Item.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+      returnDocument: 'after',
     });
     if (!item) {
       return res.status(404).json({
@@ -160,7 +160,7 @@ const markConsume = async (req, res) => {
     const item = await Item.findByIdAndUpdate(
       req.params.id,
       { status: "consumed" },
-      { new: true },
+      { returnDocument: 'after' },
     );
     if (!item) {
       return res.status(404).json({
@@ -187,7 +187,7 @@ const restore = async (req, res) => {
     const item = await Item.findByIdAndUpdate(
       req.params.id,
       { status: "available" },
-      { new: true },
+      { returnDocument: 'after' },
     );
     if (!item) {
       return res.status(404).json({
