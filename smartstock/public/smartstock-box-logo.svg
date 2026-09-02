@@ -1,0 +1,37 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="topGrad" x1="256" y1="80" x2="256" y2="230" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#12D889"/>
+      <stop offset="1" stop-color="#00A86B"/>
+    </linearGradient>
+    <linearGradient id="leftGrad" x1="95" y1="190" x2="255" y2="410" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#06B779"/>
+      <stop offset="1" stop-color="#008A58"/>
+    </linearGradient>
+    <linearGradient id="rightGrad" x1="256" y1="190" x2="420" y2="410" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#009D67"/>
+      <stop offset="1" stop-color="#00784F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Top face -->
+  <path d="M256 62L430 151L256 239L82 151L256 62Z"
+        fill="url(#topGrad)" stroke="#007A50" stroke-width="8" stroke-linejoin="round"/>
+
+  <!-- Left face -->
+  <path d="M82 151L256 239V430L82 340V151Z"
+        fill="url(#leftGrad)" stroke="#007A50" stroke-width="8" stroke-linejoin="round"/>
+
+  <!-- Right face -->
+  <path d="M430 151L256 239V430L430 340V151Z"
+        fill="url(#rightGrad)" stroke="#007A50" stroke-width="8" stroke-linejoin="round"/>
+
+  <!-- Chart bars on left face -->
+  <rect x="124" y="282" width="25" height="58" rx="6" fill="white"/>
+  <rect x="163" y="250" width="25" height="90" rx="6" fill="white"/>
+  <rect x="202" y="218" width="25" height="122" rx="6" fill="white"/>
+
+  <!-- Checkmark on right face -->
+  <path d="M300 291L337 328L397 242"
+        stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
