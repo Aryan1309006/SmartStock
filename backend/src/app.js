@@ -10,8 +10,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieparser());
 app.use(cors);
 
-app.use("/api/auth",require('./routes/auth.route'))
-app.use("/api",require('./routes/dashboard.route'))
-app.use("/api",require('./routes/items.route'))
+app.use("/api/auth", require("./routes/auth.route"));
+app.use("/api/dashboard", require("./routes/dashboard.route"));
+app.use("/api/items", require("./routes/items.route"));
 
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "API is running",
+  });
+});
 module.exports = app;

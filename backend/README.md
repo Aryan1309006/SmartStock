@@ -1,62 +1,66 @@
 # SmartStock Backend API
 
-A Node.js/Express backend for the SmartStock inventory management application. This API provides authentication and CRUD operations for managing inventory items with features like tracking purchase dates, expiry dates, and item consumption status.
+Node.js and Express API for SmartStock inventory management. The backend uses MongoDB through Mongoose and JWT authentication.
 
-## Tech Stack
+## Stack
 
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose
-- **Authentication**: JWT (JSON Web Tokens)
-- **Password Hashing**: Bcrypt
-- **Development**: Nodemon
+- Node.js
+- Express 5
+- MongoDB and Mongoose
+- JWT and bcrypt
+- Nodemon for development
 
-## Installation
+## Setup
 
-1. Navigate to the backend directory:
+From the repository root:
+
 ```bash
 cd backend
-```
-
-2. Install dependencies:
-```bash
 npm install
 ```
 
-3. Create a `.env` file in the backend root directory with the following variables:
-```
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
+Create `backend/.env`:
+
+```env
+MONGO_URI=mongodb://127.0.0.1:27017/smartstock
+JWT_SECRET=replace_with_a_long_random_secret
 PORT=3000
+NODE_ENV=development
 ```
 
-4. Start the server:
+Start the server:
+
 ```bash
 npm start
 ```
 
-The server will run with nodemon for automatic restarts during development.
+The API is available at `http://localhost:3000`. The root health check is `GET /`.
 
----
+## Authentication
 
-## API Endpoints
+Register and login return a JWT in the response and also set an HTTP-only `token` cookie. The current authentication middleware reads the bearer token from the `Authorization` header, so send this header on protected requests:
 
-### Base URL
+```http
+Authorization: Bearer <jwt>
 ```
-http://localhost:3000/api
-```
 
----
+The token expires after one day. In production, the cookie uses `Secure` and `SameSite=None`; development uses `SameSite=Lax`.
 
-## Authentication Endpoints
+## API Routes
 
-Base URL: `http://localhost:3000/api/auth`
+All routes below are relative to `http://localhost:3000`.
 
-### 1. Register User
-- **Endpoint**: `POST /api/auth/register`
-- **Description**: Register a new user account
-- **Authentication**: Not required
-- **Request Body**:
+### Authentication
+
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| POST | `/api/auth/register` | No | Create a user and issue a token |
+| POST | `/api/auth/login` | No | Authenticate a user and issue a token |
+| GET | `/api/auth/me` | Yes | Return the authenticated user |
+| POST | `/api/auth/logout` | Yes | Clear the authentication cookie |
+
+Register request:
+
 ```json
 {
   "name": "John Doe",
@@ -64,141 +68,51 @@ Base URL: `http://localhost:3000/api/auth`
   "password": "password123"
 }
 ```
-- **Success Response** (201):
-```json
-{
-  "success": true,
-  "message": "User registered successfully",
-  "data": {
-    "user": {
-      "id": "user_id",
-      "name": "John Doe",
-      "email": "john@example.com"
-    },
-    "token": "jwt_token_here"
-  }
-}
-```
-- **Error Response** (400/409/500):
-```json
-{
-  "success": false,
-  "message": "Error message"
-}
-```
 
-### 2. Login User
-- **Endpoint**: `POST /api/auth/login`
-- **Description**: Authenticate and login an existing user
-- **Authentication**: Not required
-- **Request Body**:
+Login request:
+
 ```json
 {
   "email": "john@example.com",
   "password": "password123"
 }
 ```
-- **Success Response** (200):
+
+Successful registration and login responses contain `success`, `message`, and `data.user`, with the token at `data.token`. The current-user response returns the user at `user`:
+
 ```json
 {
   "success": true,
-  "message": "Login successful",
-  "data": {
-    "user": {
-      "id": "user_id",
-      "name": "John Doe",
-      "email": "john@example.com"
-    },
-    "token": "jwt_token_here"
+  "user": {
+    "_id": "user_id",
+    "name": "John Doe",
+    "email": "john@example.com"
   }
 }
 ```
 
-### 3. Get Current User
-- **Endpoint**: `GET /api/auth/me`
-- **Description**: Retrieve current authenticated user's information
-- **Authentication**: Required (JWT token in cookie or header)
-- **Success Response** (200):
-```json
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": "user_id",
-      "name": "John Doe",
-      "email": "john@example.com"
-    }
-  }
-}
-```
+### Dashboard
 
-### 4. Logout User
-- **Endpoint**: `POST /api/auth/logout`
-- **Description**: Logout and invalidate user session
-- **Authentication**: Required (JWT token)
-- **Success Response** (200):
-```json
-{
-  "success": true,
-  "message": "Logout successful"
-}
-```
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| GET | `/api/dashboard` | Yes | Return inventory statistics |
 
----
+Response data contains `totalItems`, `freshItems`, `consumedItems`, `expiringItems`, `expiredItems`, and `inventoryValue`.
 
-## Dashboard Endpoints
+### Items
 
-Base URL: `http://localhost:3000/api`
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| POST | `/api/items` | Yes | Create an item |
+| GET | `/api/items` | Yes | List the authenticated user's items |
+| GET | `/api/items/:id` | Yes | Get one item |
+| PUT | `/api/items/:id` | Yes | Update an item |
+| DELETE | `/api/items/:id` | Yes | Delete an item |
+| PATCH | `/api/items/:id/consume` | Yes | Mark an item as consumed |
+| PATCH | `/api/items/:id/restore` | Yes | Restore an item to available status |
 
-All dashboard endpoints require authentication (JWT token).
+Create-item request:
 
-### Get Dashboard Statistics
-- **Endpoint**: `GET /api/dashboard`
-- **Description**: Retrieve inventory dashboard statistics including total items, fresh items, consumed items, expiring items, expired items, and total inventory value
-- **Authentication**: Required (JWT token)
-- **Success Response** (200):
-```json
-{
-  "success": true,
-  "data": {
-    "totalItems": 10,
-    "freshItems": 7,
-    "consumedItems": 2,
-    "expiringItems": 1,
-    "expiredItems": 0,
-    "inventoryValue": 125.50
-  }
-}
-```
-- **Error Response** (500):
-```json
-{
-  "success": false,
-  "message": "Internal server error"
-}
-```
-
-**Dashboard Metrics Explanation**:
-- **totalItems**: Total number of items in user's inventory
-- **freshItems**: Items that are active and not expiring within 7 days
-- **consumedItems**: Items marked as consumed
-- **expiringItems**: Items expiring within the next 7 days
-- **expiredItems**: Items that have already expired
-- **inventoryValue**: Total monetary value of all items (price × quantity)
-
----
-
-## Items Endpoints
-
-Base URL: `http://localhost:3000/api`
-
-All items endpoints require authentication (JWT token).
-
-### 1. Create Item
-- **Endpoint**: `POST /api`
-- **Description**: Create a new inventory item
-- **Authentication**: Required
-- **Request Body**:
 ```json
 {
   "name": "Milk",
@@ -211,353 +125,97 @@ All items endpoints require authentication (JWT token).
   "notes": "Store in refrigerator"
 }
 ```
-- **Success Response** (201):
-```json
-{
-  "success": true,
-  "message": "Item created successfully",
-  "data": {
-    "item": {
-      "_id": "item_id",
-      "userId": "user_id",
-      "name": "Milk",
-      "category": "Dairy",
-      "purchaseDate": "2024-01-15",
-      "expiryDate": "2024-02-15",
-      "price": 5.99,
-      "quantity": 2,
-      "status": "active",
-      "notes": "Store in refrigerator",
-      "createdAt": "2024-01-20T10:00:00Z",
-      "updatedAt": "2024-01-20T10:00:00Z"
-    }
-  }
-}
-```
 
-### 2. Get All Items
-- **Endpoint**: `GET /api`
-- **Description**: Retrieve all items for the authenticated user (sorted by creation date, newest first)
-- **Authentication**: Required
-- **Success Response** (200):
+Valid categories are `Pantry`, `Dairy`, `Medicine`, `Toiletries`, `Cleaning`, and `Other`. Valid statuses are `active`, `consumed`, and `expired`.
+
+Item responses use this structure:
+
 ```json
 {
   "success": true,
   "data": {
-    "items": [
-      {
-        "_id": "item_id",
-        "userId": "user_id",
-        "name": "Milk",
-        "category": "Dairy",
-        "purchaseDate": "2024-01-15",
-        "expiryDate": "2024-02-15",
-        "price": 5.99,
-        "quantity": 2,
-        "status": "active",
-        "notes": "Store in refrigerator",
-        "createdAt": "2024-01-20T10:00:00Z"
-      }
-    ]
+    "item": {}
   }
 }
 ```
 
-### 3. Get Single Item
-- **Endpoint**: `GET /api/:id`
-- **Description**: Retrieve a specific item by ID
-- **Authentication**: Required
-- **URL Parameters**: `id` - Item ID
-- **Success Response** (200):
-```json
-{
-  "success": true,
-  "data": {
-    "item": {
-      "_id": "item_id",
-      "userId": "user_id",
-      "name": "Milk",
-      "category": "Dairy",
-      "purchaseDate": "2024-01-15",
-      "expiryDate": "2024-02-15",
-      "price": 5.99,
-      "quantity": 2,
-      "status": "active",
-      "notes": "Store in refrigerator",
-      "createdAt": "2024-01-20T10:00:00Z"
-    }
-  }
-}
-```
+List responses contain the items at `data.items` and are sorted newest first. Item IDs must be valid MongoDB ObjectIds.
 
-### 4. Update Item
-- **Endpoint**: `PUT /api/:id`
-- **Description**: Update an existing item
-- **Authentication**: Required
-- **URL Parameters**: `id` - Item ID
-- **Request Body** (Any fields to update):
-```json
-{
-  "quantity": 1,
-  "price": 5.49,
-  "status": "active"
-}
-```
-- **Success Response** (200):
-```json
-{
-  "success": true,
-  "message": "Item updated successfully",
-  "data": {
-    "item": {
-      "_id": "item_id",
-      "userId": "user_id",
-      "name": "Milk",
-      "quantity": 1,
-      "price": 5.49,
-      "status": "active",
-      "updatedAt": "2024-01-20T11:00:00Z"
-    }
-  }
-}
-```
+## Error Responses
 
-### 5. Delete Item
-- **Endpoint**: `DELETE /api/:id`
-- **Description**: Delete an item from inventory
-- **Authentication**: Required
-- **URL Parameters**: `id` - Item ID
-- **Success Response** (200):
-```json
-{
-  "success": true,
-  "message": "Item deleted successfully"
-}
-```
+Errors use this structure:
 
-### 6. Mark Item as Consumed
-- **Endpoint**: `PATCH /api/:id/consume`
-- **Description**: Mark an item as consumed (decrease quantity or change status)
-- **Authentication**: Required
-- **URL Parameters**: `id` - Item ID
-- **Request Body** (Optional):
-```json
-{
-  "quantityConsumed": 1
-}
-```
-- **Success Response** (200):
-```json
-{
-  "success": true,
-  "message": "Item marked as consumed",
-  "data": {
-    "item": {
-      "_id": "item_id",
-      "quantity": 1,
-      "status": "consumed",
-      "updatedAt": "2024-01-20T11:30:00Z"
-    }
-  }
-}
-```
-
-### 7. Restore Item
-- **Endpoint**: `PATCH /api/:id/restore`
-- **Description**: Restore a consumed item back to active status
-- **Authentication**: Required
-- **URL Parameters**: `id` - Item ID
-- **Success Response** (200):
-```json
-{
-  "success": true,
-  "message": "Item restored successfully",
-  "data": {
-    "item": {
-      "_id": "item_id",
-      "status": "active",
-      "updatedAt": "2024-01-20T11:45:00Z"
-    }
-  }
-}
-```
-
----
-
-## Authentication
-
-The API uses JWT (JSON Web Tokens) for authentication. 
-
-- Tokens are obtained from the `/api/auth/register` or `/api/auth/login` endpoints
-- Include the token in the `Cookie` header or `Authorization` header for protected endpoints
-- Token format: `Authorization: Bearer <token>`
-- Token expiry: 1 day
-
----
-
-## Error Handling
-
-All endpoints return standardized error responses:
-
-- **400 Bad Request**: Incomplete or invalid request data
-- **401 Unauthorized**: Missing or invalid authentication token
-- **409 Conflict**: Resource already exists
-- **500 Internal Server Error**: Server-side error
-
-Standard error response format:
 ```json
 {
   "success": false,
-  "message": "Error message describing what went wrong"
+  "message": "Error message"
 }
 ```
 
----
+Common status codes:
 
-## Database Models
+- `400`: Invalid or incomplete input, including an invalid item ID
+- `401`: Missing, expired, or invalid bearer token
+- `404`: User or item not found
+- `409`: User already exists
+- `500`: Internal server error
 
-### User Model
+## Data Models
+
+### User
+
 - `_id`: MongoDB ObjectId
-- `name`: String (required)
-- `email`: String (required, unique)
-- `password`: String (hashed, required)
-- `createdAt`: Date
-- `updatedAt`: Date
+- `name`: required string
+- `email`: required string
+- `password`: required hashed string
+- `createdAt`, `updatedAt`: timestamps
 
-### Item Model
+### Item
+
 - `_id`: MongoDB ObjectId
-- `userId`: String (reference to User, required)
-- `name`: String (required)
-- `category`: String (required) - Valid values: 'Pantry', 'Dairy', 'Medicine', 'Toiletries', 'Cleaning', 'Other'
-- `purchaseDate`: Date (required)
-- `expiryDate`: Date (required)
-- `price`: Number (required, must be > 0)
-- `quantity`: Number (default: 1)
-- `status`: String (required) - Valid values: 'active', 'consumed', 'expired'
-- `notes`: String (optional)
-- `createdAt`: Date
-- `updatedAt`: Date
-
----
+- `userId`: required User reference
+- `name`: required string
+- `category`: required category enum
+- `quantity`: required number, minimum `1`
+- `purchaseDate`: required date
+- `expiryDate`: required date
+- `price`: number, default `0`
+- `notes`: optional string
+- `status`: `active`, `consumed`, or `expired`
+- `consumedAt`: optional date
+- `createdAt`, `updatedAt`: timestamps
 
 ## Project Structure
 
-```
+```text
 backend/
-├── index.js                 # Entry point
-├── package.json            # Dependencies and scripts
-├── README.md               # This file
+├── index.js
+├── package.json
+├── README.md
 └── src/
-    ├── app.js              # Express app configuration
+    ├── app.js
     ├── config/
-    │   └── db.js          # Database connection
+    │   ├── cors.js
+    │   └── db.js
     ├── controllers/
-    │   ├── authController.js         # Auth logic
-    │   ├── itemsController.js        # Items CRUD logic
-    │   └── dashboardController.js    # Dashboard statistics
+    │   ├── authController.js
+    │   ├── dashboardController.js
+    │   └── itemsController.js
     ├── middleware/
-    │   └── authMiddleware.js      # JWT verification
+    │   └── authMiddleware.js
     ├── models/
-    │   ├── user.js        # User schema
-    │   └── item.js        # Item schema
+    │   ├── item.js
+    │   └── user.js
     └── routes/
-        ├── auth.route.js      # Auth endpoints
-        ├── items.route.js     # Items endpoints
-        └── dashboard.route.js # Dashboard endpoints
+        ├── auth.route.js
+        ├── dashboard.route.js
+        └── items.route.js
 ```
 
----
+## Available Script
 
-## Development
-
-To start the development server:
 ```bash
 npm start
 ```
 
-The server will run on the port specified in your `.env` file (default: 3000) and automatically restart when files change thanks to Nodemon.
-
----
-
-## Debugging & Fixed Issues
-
-This section documents all issues found and fixed during the development process:
-
-### 1. **Typo in Function Name (authController.js)**
-- **Issue**: Function was declared as `generetToken` but called as `generateToken`
-- **Error**: `generateToken is not a function`
-- **Fix**: Renamed function to `generateToken` (corrected typo)
-
-### 2. **Variable Shadowing (authController.js)**
-- **Issue**: In `getme()` function, `const user = user.findById()` shadowed the User model
-- **Error**: `TypeError: user.findById is not a function`
-- **Fix**: Changed to `const user = User.findById()` (capital U)
-
-### 3. **Async/Await Missing (authController.js)**
-- **Issue**: `getme()` function was not declared as async but used await
-- **Error**: Returned promise instead of user data
-- **Fix**: Added `async` keyword to function declaration
-
-### 4. **Wrong Model Import (dashboardController.js)**
-- **Issue**: Imported `../models/itemModel` which doesn't exist
-- **Error**: `Module not found`
-- **Fix**: Changed to `../models/item`
-
-### 5. **Variable Name Mismatch (dashboardController.js)**
-- **Issue**: Variable declared as `sevenDay` but used as `sevenDaysLater`
-- **Error**: `sevenDaysLater is not defined`
-- **Fix**: Changed usage to `sevenDay`
-
-### 6. **Wrong Field Names (dashboardController.js)**
-- **Issue**: Used `user: userId` instead of `userId: userId` in queries
-- **Error**: Queries returned no results
-- **Fix**: Changed to `userId: userId` to match schema
-
-### 7. **Missing Model Export (item.js)**
-- **Issue**: Item schema defined but never exported
-- **Error**: `Cannot import Item model`
-- **Fix**: Added `module.exports = mongoose.model("Item", itemSchema);`
-
-### 8. **Assignment to Const Variable (authController.js)**
-- **Issue**: Declared `const { email }` but tried to reassign: `email = email.trim().toLowerCase()`
-- **Error**: `TypeError: Assignment to constant variable`
-- **Fix**: Changed `const` to `let` in destructuring
-
-### 9. **Missing Authentication Middleware (auth.route.js)**
-- **Issue**: `/api/auth/me` and `/api/auth/logout` endpoints missing `protect` middleware
-- **Error**: `Cannot read properties of undefined (reading 'userId')`
-- **Fix**: Imported and added `protect` middleware to protected routes
-
-### 10. **Invalid Category Enum (item.js)**
-- **Issue**: Item model enum only had `["Pantry", "Medicine", "Toiletries", "Cleaning", "Other"]` but "Dairy" was used in examples
-- **Error**: `Dairy is not a valid enum value for path category`
-- **Fix**: Added "Dairy" to the enum array
-
-### 11. **Database Connection Not Awaited (index.js)**
-- **Issue**: `connectToDB()` called without await, server started before MongoDB connection
-- **Error**: `Connection refused` on all POST requests
-- **Fix**: Made `startServer()` async and awaited `connectToDB()` before starting the server
-
-### 12. **Route Order Conflict (app.js)**
-- **Issue**: Dashboard route registered after items route, `/api/dashboard` matched `/:id` pattern first
-- **Error**: `CastError: Cast to ObjectId failed for value "dashboard"`
-- **Fix**: Moved dashboard route registration before items routes
-
-### 13. **Deprecation Warnings (itemsController.js)**
-- **Issue**: Used deprecated `{ new: true }` option in `findByIdAndUpdate()` calls
-- **Warning**: `mongoose: the new option for findOneAndUpdate() is deprecated`
-- **Fix**: Replaced with `{ returnDocument: 'after' }` in 3 places:
-  - `updateOne()` function
-  - `markConsume()` function
-  - `restore()` function
-
-### 14. **Schema Validation Issue (user.js)**
-- **Issue**: Used `require: true` instead of `required: true` in schema fields
-- **Error**: Validation not enforced properly
-- **Fix**: Changed all `require` to `required` in User schema
-
----
-
-## License
-
-ISC
+This starts `nodemon index.js`.

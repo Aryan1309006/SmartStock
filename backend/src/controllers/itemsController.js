@@ -1,5 +1,6 @@
 const Item = require("../models/item");
 const User = require("../models/user");
+const mongoose = require("mongoose");
 
 const createItem = async (req, res) => {
   try {
@@ -25,7 +26,7 @@ const createItem = async (req, res) => {
     ) {
       return res.status(400).json({
         success: false,
-        message: "Incomplete cradiential",
+        message: "Incomplete credential",
       });
     }
     if (!req.user || !req.user.userId) {
@@ -34,9 +35,7 @@ const createItem = async (req, res) => {
         message: "Authentication required",
       });
     }
-    if (!quantity || quantity <= 0) {
-      quantity = 1;
-    }
+    const itemQuantity = !quantity || quantity <= 0 ? 1 : quantity;
 
     const item = await Item.create({
       userId: req.user.userId,
@@ -45,7 +44,7 @@ const createItem = async (req, res) => {
       purchaseDate,
       price,
       notes: notes ? notes.trim() : "",
-      quantity,
+      quantity: itemQuantity,
       status,
       expiryDate,
     });
@@ -88,6 +87,13 @@ const showAll = async (req, res) => {
 };
 const showOne = async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid item ID",
+      });
+    }
+
     const item = await Item.findById(req.params.id);
     if (!item) {
       return res.status(404).json({

@@ -8,6 +8,14 @@ const generateToken = (userId) => {
   });
 };
 
+const getCookieOptions = () => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  path: "/",
+  maxAge: 24 * 60 * 60 * 1000,
+});
+
 const register = async (req, res) => {
   try {
     let { name, email, password } = req.body;
@@ -34,6 +42,8 @@ const register = async (req, res) => {
       password: hashPassword,
     });
     const token = generateToken(user._id);
+
+    res.cookie("token", token, getCookieOptions());
     return res.status(201).json({
       success: true,
       message: "User registered successfully",
@@ -93,6 +103,7 @@ const login = async (req, res) => {
     // 4. Generate JWT
     const token = generateToken(user._id);
 
+    res.cookie("token", token, getCookieOptions());
     // 5. Response
     return res.status(200).json({
       success: true,
@@ -143,11 +154,7 @@ const logout = async (req, res) => {
   try {
     // If JWT is stored in an HTTP-only cookie,
     // clear it here.
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
+    res.clearCookie("token", getCookieOptions());
 
     return res.status(200).json({
       success: true,
@@ -163,4 +170,4 @@ const logout = async (req, res) => {
   }
 };
 
-module.exports = { register, login,getme, logout };
+module.exports = { register, login, getme, logout };
