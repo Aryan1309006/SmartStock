@@ -1,16 +1,5 @@
 @import "tailwindcss";
 
-@layer base {
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-
-  h1 {
-    font-size: 2rem;
-  }
-}
-
 /* Hide scrollbar — still scrollable via mouse/touch */
 * {
   scrollbar-width: none;        /* Firefox */
