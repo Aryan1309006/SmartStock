@@ -6,12 +6,13 @@ import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
+import Login from "./components/auth/Login";
 const App = () => {
   return (
     <div className="bg-gray-500">
       <Routes>
         {/* Public */}
-        {/* <Route path="/login" element={<Login />} /> */}
+        <Route path="/login" element={<Login />} />
 
         {/* Dashboard Layout */}
         <Route element={<DashboardLayout />}>

@@ -1,5 +1,10 @@
 // src/data/dummyData.js
-
+import dairyImage from "../images/Dairy.png";
+import bakeryImage from "../images/Bakery.png";
+import medicineImage from "../images/Medicine.png";
+import toiletriesImage from "../images/Toiletries.png";
+import cleaningImage from "../images/Cleaning.png";
+import PantryImage from "../images/Pantry.png";
 export const dummyUser = {
   _id: "65f1a2b3c4d5e6f789001234",
   name: "Aryan Patil",
@@ -17,6 +22,15 @@ export const dummyDashboard = {
     expiredItems: 2,
     inventoryValue: 12450.75,
   },
+};
+
+export const categoryImages = {
+  Dairy:dairyImage,
+  Pantry:PantryImage,
+  Bakery: bakeryImage,
+  Medicine: medicineImage,
+  Toiletries: toiletriesImage,
+  Cleaning: cleaningImage
 };
 
 // Items response

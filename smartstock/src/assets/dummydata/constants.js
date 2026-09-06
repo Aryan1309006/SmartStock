@@ -1,5 +1,14 @@
 // src/data/constants.js
 
+import {
+  Milk,
+  Package,
+  Pill,
+  ShoppingBasket,
+  Sparkles,
+  SprayCan,
+} from "lucide-react";
+
 export const categories = [
   "Pantry",
   "Dairy",
@@ -15,7 +24,7 @@ export const statuses = [
   "expired",
 ];
 
-export const categori = [
+export const categoriesData = [
   {
     name: "Pantry",
     icon: ShoppingBasket,
