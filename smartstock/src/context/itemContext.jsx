@@ -31,6 +31,20 @@ export const ItemProvider = ({ children }) => {
       setLoading(false);
     }
   };
+  const fetchSingleItem = async (id) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const data = await getItemById(id);
+
+      setItems(data.data?.items ?? data.items ?? []);
+    } catch (error) {
+      setError(error.response?.data?.message || "Failed to fetch items");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Add an item and append the server-created record to local state.
   const addItem = async (itemData) => {

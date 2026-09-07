@@ -10,9 +10,10 @@ const Navbar = () => {
     "/inventory": "Inventory",
     "/products": "Products",
     "/analytics": "Analytics",
+    "/inventory/": "InventoryItem",
   };
   const title = titles[location.pathname] || "";
-
+  const isInventoryItem = location.pathname.startsWith("/inventory/");
   return (
     <nav className="h-16 w-full flex items-center justify-between px-4">
       <div className="flex flex-col">
@@ -22,10 +23,12 @@ const Navbar = () => {
         )}
       </div>
 
-      <button className="flex bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600">
-        <Plus />
-        Add Item
-      </button>
+      {!isInventoryItem && (
+        <button className="flex bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600">
+          {" "}
+          <Plus /> Add Item{" "}
+        </button>
+      )}
     </nav>
   );
 };

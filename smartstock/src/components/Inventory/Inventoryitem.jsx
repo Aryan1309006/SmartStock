@@ -1,7 +1,9 @@
 import React from "react";
 import { categoryImages } from "../../assets/dummydata/item";
+import {Link} from "react-router-dom"
 const Inventoryitem = ({ item }) => {
   return (
+    <Link to={`/inventory/${item._id}`}>
     <div className="w-[100%] px-4 flex  gap-4   place-items-center h-14 rounded-t-3xl font-semibold text-gray-500">
 
       {/* Item */}
@@ -37,7 +39,7 @@ const Inventoryitem = ({ item }) => {
         action
       </div>
 
-    </div>
+    </div></Link>
   );
 };
 

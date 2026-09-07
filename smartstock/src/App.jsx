@@ -7,6 +7,7 @@ import Settings from "./pages/Settings";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Login from "./components/auth/Login";
+import Item from "./components/Inventory/Item";
 const App = () => {
   return (
     <div className="bg-gray-500">
@@ -20,13 +21,10 @@ const App = () => {
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/inventory/:id" element={<Item />} />
         </Route>
-
         {/* Default */}
-        <Route
-          path="*"
-          element={<Navigate to="/dashboard" replace />}
-        />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </div>
   );

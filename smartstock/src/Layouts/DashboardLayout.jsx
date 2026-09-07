@@ -3,6 +3,7 @@ import Sidebar from "../components/Sidebar";
 import { Outlet } from "react-router-dom";
 
 const DashboardLayout = ({ children }) => {
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar />

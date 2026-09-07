@@ -19,8 +19,7 @@ export const navOption = [
     component: "Inventory",
     link: "/inventory",
     icon: Package,
-  },
-  {
+  },{
     component: "Analytics",
     link: "/analytics",
     icon: Plus,
