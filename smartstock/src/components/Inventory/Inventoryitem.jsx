@@ -4,7 +4,7 @@ import {Link} from "react-router-dom"
 const Inventoryitem = ({ item }) => {
   return (
     <Link to={`/inventory/${item._id}`}>
-    <div className="w-[100%] px-4 flex  gap-4   place-items-center h-14 rounded-t-3xl font-semibold text-gray-500">
+    <div className="w-[100%] px-4 flex  gap-4 bg-gray-100 border-b-gray-50  place-items-center h-14  font-semibold text-gray-500 hover:bg-gray-100">
 
       {/* Item */}
       <div className=" flex justify-content gap-3 w-[20%] text-center">

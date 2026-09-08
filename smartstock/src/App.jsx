@@ -10,7 +10,7 @@ import Login from "./components/auth/Login";
 import Item from "./components/Inventory/Item";
 const App = () => {
   return (
-    <div className="bg-gray-500">
+    <div >
       <Routes>
         {/* Public */}
         <Route path="/login" element={<Login />} />

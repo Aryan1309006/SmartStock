@@ -32,7 +32,7 @@ export const navOption = [
 ];
 const Sidebar = () => {
   return (
-    <div className="bg-white fixed top-0 left-0 z-40 h-screen w-70 flex flex-col py-7 pl-4 pr-10 ">
+    <div className="bg-white fixed top-0 left-0 z-40 h-screen w-70 flex flex-col py-7 pl-4 pr-10 border-r  border-r-gray-200 ">
       <div className="h-20"><img src={logo} alt="SmartStock Logo"  className="h-15"/></div>
       <div className="flex flex-col gap-1 mb-75 font-semibold">
         {navOption.map((item) => {

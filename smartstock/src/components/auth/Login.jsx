@@ -19,7 +19,10 @@ const Login = () => {
     <div className="w-full h-screen bg-gray-100 flex items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className="flex gap-7 justify-center items-center md:w-90 h-130 border-2 border-emerald-700 flex-col bg-white rounded-4xl font-semibold"
+        className="w-[90%] max-w-md min-h-[520px] p-6
+           flex flex-col items-center justify-center gap-7
+           bg-white border-2 border-emerald-700
+           rounded-4xl font-semibold"
       >
         {/* Tabs */}
         <div className="w-40 border border-gray-400 rounded-full flex">
@@ -56,7 +59,9 @@ const Login = () => {
               placeholder="Email"
               autoComplete="email"
               required
-              className="w-70 h-10 border border-gray-300 px-2"
+              className="w-full max-w-[280px] h-10 border border-gray-300
+             rounded-lg px-3 outline-none
+             focus:border-emerald-500"
             />
 
             <input
@@ -64,12 +69,14 @@ const Login = () => {
               placeholder="Password"
               autoComplete="current-password"
               required
-              className="w-70 h-10 border border-gray-300 px-2"
+              className="w-full max-w-[280px] h-10 border border-gray-300
+             rounded-lg px-3 outline-none
+             focus:border-emerald-500"
             />
 
             <button
               type="submit"
-              className="h-10 w-70 rounded-lg p-2 bg-emerald-400 text-white"
+               className="h-10 w-70 rounded-lg p-2 bg-emerald-400 text-white"
             >
               Log In
             </button>
@@ -81,7 +88,9 @@ const Login = () => {
               placeholder="Name"
               autoComplete="name"
               required
-              className="w-70 h-10 border border-gray-300 px-2"
+              className="w-full max-w-[280px] h-10 border border-gray-300
+             rounded-lg px-3 outline-none
+             focus:border-emerald-500"
             />
 
             <input
@@ -89,7 +98,9 @@ const Login = () => {
               placeholder="Email"
               autoComplete="email"
               required
-              className="w-70 h-10 border border-gray-300 px-2"
+              className="w-full max-w-[280px] h-10 border border-gray-300
+             rounded-lg px-3 outline-none
+             focus:border-emerald-500"
             />
 
             <input
@@ -97,7 +108,9 @@ const Login = () => {
               placeholder="Password"
               autoComplete="new-password"
               required
-              className="w-70 h-10 border border-gray-300 px-2"
+              className="w-full max-w-[280px] h-10 border border-gray-300
+             rounded-lg px-3 outline-none
+             focus:border-emerald-500"
             />
 
             <button
