@@ -1,45 +1,57 @@
 import React from "react";
 import { categoryImages } from "../../assets/dummydata/item";
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom";
+
 const Inventoryitem = ({ item }) => {
+  const getStatusClasses = (status) => {
+    switch (status) {
+      case "expired":
+        return "bg-red-50 text-red-600 border border-red-200";
+      case "consumed":
+        return "bg-amber-50 text-amber-700 border border-amber-200";
+      default:
+        return "bg-emerald-50 text-emerald-700 border border-emerald-200";
+    }
+  };
+
   return (
-    <Link to={`/inventory/${item._id}`}>
-    <div className="w-[100%] px-4 flex  gap-4 bg-gray-100 border-b-gray-50  place-items-center h-14  font-semibold text-gray-500 hover:bg-gray-100">
+    <Link
+      to={`/inventory/${item._id}`}
+      className="block bg-gray-50 transition hover:bg-emerald-50"
+    >
+      <div className="grid h-16 grid-cols-[1.5fr_1fr_0.7fr_1.1fr_1fr_0.8fr_1fr] items-center gap-3 border-b border-gray-200 px-5 text-sm font-semibold text-gray-600">
+        <div className="flex items-center gap-3 text-left">
+          <img
+            src={categoryImages[item.category]}
+            alt={item.name}
+            className="h-10 w-10 rounded-lg object-cover"
+          />
+          <span className="font-bold text-gray-900">{item.name}</span>
+        </div>
 
-      {/* Item */}
-      <div className=" flex justify-content gap-3 w-[20%] text-center">
-        <img
-          src={categoryImages[item.category]}
-          alt={item.name}
-          className="w-10 h-10 rounded-lg object-cover"
-        />
+        <div className="hidden text-center sm:block">{item.category}</div>
 
-        <span className="font-bold text-black">{item.name}</span>
+        <div className="text-center">{item.quantity}</div>
+
+        <div className="text-center">
+          {new Date(item.expiryDate).toLocaleDateString()}
+        </div>
+
+        <div className="text-center">
+          <span
+            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium capitalize ${getStatusClasses(
+              item.status,
+            )}`}
+          >
+            {item.status}
+          </span>
+        </div>
+
+        <div className="hidden text-center lg:block">₹{item.price}</div>
+
+        <div className="hidden text-center lg:block">View</div>
       </div>
-
-      {/* Category */}
-      <div className="w-[15%]  ">{item.category}</div>
-
-      {/* Quantity */}
-      <div  className="w-[10%] ">{item.quantity}</div>
-
-      {/* Expiry */}
-      <div className="w-[15%] ">
-        {new Date(item.expiryDate).toLocaleDateString()}
-      </div>
-
-      {/* Status */}
-      <div className="w-[15%] text-center">{item.status}</div>
-
-      {/* Price */}
-      <div  className="w-[10%] text-center ">₹{item.price}</div>
-
-      {/* Action */}
-      <div className="w-[20%] text-center">
-        action
-      </div>
-
-    </div></Link>
+    </Link>
   );
 };
 

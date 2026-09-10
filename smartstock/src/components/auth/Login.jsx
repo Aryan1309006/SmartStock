@@ -16,13 +16,10 @@ const Login = () => {
   };
 
   return (
-    <div className="w-full h-screen bg-gray-100 flex items-center justify-center">
+    <div className="flex min-h-screen w-full items-center justify-center bg-gray-100 px-4 py-6">
       <form
         onSubmit={handleSubmit}
-        className="w-[90%] max-w-md min-h-[520px] p-6
-           flex flex-col items-center justify-center gap-7
-           bg-white border-2 border-emerald-700
-           rounded-4xl font-semibold"
+        className="flex min-h-130 w-full max-w-md flex-col items-center justify-center gap-7 rounded-4xl border-2 border-emerald-700 bg-white p-5 font-semibold sm:p-6"
       >
         {/* Tabs */}
         <div className="w-40 border border-gray-400 rounded-full flex">
@@ -59,7 +56,7 @@ const Login = () => {
               placeholder="Email"
               autoComplete="email"
               required
-              className="w-full max-w-[280px] h-10 border border-gray-300
+              className="w-full max-w-70 h-10 border border-gray-300
              rounded-lg px-3 outline-none
              focus:border-emerald-500"
             />
@@ -69,14 +66,14 @@ const Login = () => {
               placeholder="Password"
               autoComplete="current-password"
               required
-              className="w-full max-w-[280px] h-10 border border-gray-300
+              className="w-full max-w-70 h-10 border border-gray-300
              rounded-lg px-3 outline-none
              focus:border-emerald-500"
             />
 
             <button
               type="submit"
-               className="h-10 w-70 rounded-lg p-2 bg-emerald-400 text-white"
+               className="h-10 w-full max-w-70 rounded-lg bg-emerald-400 p-2 text-white"
             >
               Log In
             </button>
@@ -88,7 +85,7 @@ const Login = () => {
               placeholder="Name"
               autoComplete="name"
               required
-              className="w-full max-w-[280px] h-10 border border-gray-300
+              className="w-full max-w-70 h-10 border border-gray-300
              rounded-lg px-3 outline-none
              focus:border-emerald-500"
             />
@@ -98,7 +95,7 @@ const Login = () => {
               placeholder="Email"
               autoComplete="email"
               required
-              className="w-full max-w-[280px] h-10 border border-gray-300
+              className="w-full max-w-70 h-10 border border-gray-300
              rounded-lg px-3 outline-none
              focus:border-emerald-500"
             />
@@ -108,14 +105,14 @@ const Login = () => {
               placeholder="Password"
               autoComplete="new-password"
               required
-              className="w-full max-w-[280px] h-10 border border-gray-300
+              className="w-full max-w-70 h-10 border border-gray-300
              rounded-lg px-3 outline-none
              focus:border-emerald-500"
             />
 
             <button
               type="submit"
-              className="h-10 w-70 rounded-lg p-2 bg-emerald-400 text-white"
+              className="h-10 w-full max-w-70 rounded-lg bg-emerald-400 p-2 text-white"
             >
               Sign Up
             </button>
@@ -126,7 +123,7 @@ const Login = () => {
 
         <button
           type="button"
-          className="flex items-center justify-center w-70 h-10 border  rounded-lg border-emerald-500"
+          className="flex h-10 w-full max-w-70 items-center justify-center rounded-lg border border-emerald-500"
         >
           <img src={google} alt="Google" className="w-5 h-5 mr-2" />
           Log in with Google
