@@ -15,6 +15,7 @@ import {
 } from "../assets/dummydata/item";
 
 import Dashborardcard from "../components/dashboard/Dashborardcard";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const user = dummyUser;
@@ -78,6 +79,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
 
         {/* Total Items */}
+           <Link to="/inventory">
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md">
           <div className="flex items-center justify-between">
             <p className="font-semibold text-gray-600">
@@ -90,9 +92,10 @@ const Dashboard = () => {
           <p className="mt-5 text-3xl font-bold text-gray-900">
             {dashboard.totalItems}
           </p>
-        </div>
+        </div></Link>
 
         {/* Active Items */}
+       
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md">
           <div className="flex items-center justify-between">
             <p className="font-semibold text-gray-600">
@@ -103,7 +106,7 @@ const Dashboard = () => {
           </div>
 
           <p className="mt-5 text-3xl font-bold text-gray-900">
-            {dashboard.activeItems}
+            {dashboard.freshItems}
           </p>
         </div>
 

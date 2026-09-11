@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
+import {Link}from "react-router-dom"
 import { ChevronRight } from "lucide-react";
 
 const Dashborardcard = ({ item = [], name, type }) => {
+    const[slice,setSlice]=useState(4)
   return (
+    
     <div className="w-full rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
 
       {/* ================= HEADER ================= */}
@@ -14,6 +17,7 @@ const Dashborardcard = ({ item = [], name, type }) => {
         <button
           type="button"
           className="flex items-center gap-1 text-sm font-semibold text-blue-600 transition hover:text-blue-700"
+          onClick={()=>{setSlice(item.length)}}
         >
           View all
           <ChevronRight size={17} />
@@ -23,7 +27,8 @@ const Dashborardcard = ({ item = [], name, type }) => {
       {/* ================= ITEMS ================= */}
       <div className="space-y-3">
 
-        {item.slice(0, 4).map((product) => (
+        {item.slice(0,slice).map((product) => (
+            <Link to={`/inventory/${product._id}`}>
           <div
             key={product._id}
             className="flex items-center justify-between rounded-xl bg-gray-50 p-4 transition hover:bg-gray-100"
@@ -80,6 +85,7 @@ const Dashborardcard = ({ item = [], name, type }) => {
                 </span>
               )}
           </div>
+          </Link>
         ))}
       </div>
 

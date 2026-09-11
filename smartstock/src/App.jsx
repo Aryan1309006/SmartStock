@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import DashboardLayout from "./Layouts/DashboardLayout";
 import Inventory from "./pages/Inventory";
@@ -8,9 +8,26 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Login from "./components/auth/Login";
 import Item from "./components/Inventory/Item";
+import Loader from "./components/Loader";
+import Footer from "./components/Footer";
+
 const App = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <Loader text="Loading SmartStock..." />;
+  }
+
   return (
-    <div >
+    <div>
       <Routes>
         {/* Public */}
         <Route path="/login" element={<Login />} />

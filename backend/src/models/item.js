@@ -14,8 +14,8 @@ const itemSchema = new mongoose.Schema(
       required: true,
     },
     quantity: { type: Number, required: true, min: 1 },
-    purchaseDate: { type: Date, required: true },
-    expiryDate: { type: Date, required: true },
+    purchaseDate: { type: String, required: true, trim: true },
+    expiryDate: { type: String, required: true, trim: true },
     price: { type: Number, default: 0 },
     notes: { type: String },
     status: {
