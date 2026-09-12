@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.*
+backend/.env
+backend/node_modules/
+smartstock/node_modules/
+smartstock/dist/
+smartstock/resolve.md
+.DS_Store

@@ -21,7 +21,6 @@ const createItem = async (req, res) => {
       price == null ||
       price <= 0 ||
       price == undefined ||
-      !status ||
       !expiryDate
     ) {
       return res.status(400).json({
@@ -45,7 +44,7 @@ const createItem = async (req, res) => {
       price,
       notes: notes ? notes.trim() : "",
       quantity: itemQuantity,
-      status,
+      status: status || "active",
       expiryDate,
     });
 
@@ -94,7 +93,10 @@ const showOne = async (req, res) => {
       });
     }
 
-    const item = await Item.findById(req.params.id);
+    const item = await Item.findOne({
+      _id: req.params.id,
+      userId: req.user.userId,
+    });
     if (!item) {
       return res.status(404).json({
         success: false,
@@ -117,9 +119,26 @@ const showOne = async (req, res) => {
 };
 const updateOne = async (req, res) => {
   try {
-    const item = await Item.findByIdAndUpdate(req.params.id, req.body, {
-      returnDocument: 'after',
-    });
+    const allowedFields = [
+      "name",
+      "category",
+      "purchaseDate",
+      "expiryDate",
+      "price",
+      "notes",
+      "quantity",
+      "status",
+    ];
+    const updates = Object.fromEntries(
+      allowedFields
+        .filter((field) => req.body[field] !== undefined)
+        .map((field) => [field, req.body[field]]),
+    );
+    const item = await Item.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.userId },
+      { $set: updates },
+      { new: true, runValidators: true },
+    );
     if (!item) {
       return res.status(404).json({
         success: false,
@@ -142,7 +161,10 @@ const updateOne = async (req, res) => {
 };
 const deleteOne = async (req, res) => {
   try {
-    const item = await Item.findByIdAndDelete(req.params.id);
+    const item = await Item.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user.userId,
+    });
     if (!item) {
       return res.status(404).json({
         success: false,
@@ -163,10 +185,10 @@ const deleteOne = async (req, res) => {
 };
 const markConsume = async (req, res) => {
   try {
-    const item = await Item.findByIdAndUpdate(
-      req.params.id,
-      { status: "consumed" },
-      { returnDocument: 'after' },
+    const item = await Item.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.userId },
+      { status: "consumed", consumedAt: new Date() },
+      { new: true, runValidators: true },
     );
     if (!item) {
       return res.status(404).json({
@@ -190,10 +212,10 @@ const markConsume = async (req, res) => {
 };
 const restore = async (req, res) => {
   try {
-    const item = await Item.findByIdAndUpdate(
-      req.params.id,
-      { status: "available" },
-      { returnDocument: 'after' },
+    const item = await Item.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.userId },
+      { status: "active", consumedAt: null },
+      { new: true, runValidators: true },
     );
     if (!item) {
       return res.status(404).json({
