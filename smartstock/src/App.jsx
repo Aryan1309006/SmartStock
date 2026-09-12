@@ -12,6 +12,7 @@ import Item from "./components/Inventory/Item";
 import Loader from "./components/Loader";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
+import Notifications from "./pages/Notifications";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -43,6 +44,7 @@ const App = () => {
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/notification" element={<Notifications />} />
           <Route path="/inventory/:id" element={<Item />} />
         </Route>
         {/* Default */}

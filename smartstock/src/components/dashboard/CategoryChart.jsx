@@ -5,9 +5,33 @@ import {
   Cell,
   Tooltip,
   Legend,
+  ResponsiveContainer,
 } from "recharts";
 
-const CategoryChart = ({ items = [] }) => {
+const CategoryChart = ({ items = [], dashboard = {} }) => {
+  const [isMobile, setIsMobile] = React.useState(
+    () =>
+      typeof window !== "undefined"
+        ? window.innerWidth < 640
+        : false,
+  );
+
+  const [activeIndex, setActiveIndex] = React.useState(null);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   const categoryCount = items.reduce((acc, item) => {
     acc[item.category] = (acc[item.category] || 0) + 1;
     return acc;
@@ -17,7 +41,7 @@ const CategoryChart = ({ items = [] }) => {
     ([category, count]) => ({
       name: category,
       value: count,
-    })
+    }),
   );
 
   const COLORS = [
@@ -29,35 +53,58 @@ const CategoryChart = ({ items = [] }) => {
   ];
 
   return (
-    <div className="w-full rounded-2xl bg-white p-6 shadow-sm">
+    <div className="w-full rounded-2xl bg-white p-4 shadow-sm sm:p-6">
       <h2 className="text-lg font-semibold text-gray-800">
         Inventory by Category
       </h2>
 
       <p className="mb-4 text-sm text-gray-500">
-        Distribution of your inventory items
+        Distribution of your inventory items · {dashboard.totalItems || items.length} total
       </p>
 
-      <div className="h-[320px] w-full">
-        <PieChart
-          responsive
-          style={{ width: "100%", height: "100%" }}
-        >
+      <div className="h-[300px] w-full sm:h-[320px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
             <Pie
               data={chartData}
-              cx="40%"
+              cx="50%"
               cy="50%"
-              innerRadius="28%"
-              outerRadius="48%"
+              innerRadius={isMobile ? 35 : 55}
+              outerRadius={isMobile ? 80 : 100}
               paddingAngle={2}
               dataKey="value"
               stroke="none"
+              tabIndex={-1}
+              onMouseEnter={(_, index) => {
+                setActiveIndex(index);
+              }}
+              onMouseLeave={() => {
+                setActiveIndex(null);
+              }}
             >
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
-                  stroke="none"
+                  stroke={
+                    index === activeIndex
+                      ? "#0f172a"
+                      : "none"
+                  }
+                  strokeWidth={
+                    index === activeIndex ? 2 : 0
+                  }
+                  opacity={
+                    activeIndex === null ||
+                    index === activeIndex
+                      ? 1
+                      : 0.75
+                  }
+                  style={{
+                    outline: "none",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                  }}
                 />
               ))}
             </Pie>
@@ -67,23 +114,33 @@ const CategoryChart = ({ items = [] }) => {
                 `${value} items`,
                 name,
               ]}
+              contentStyle={{
+                borderRadius: 12,
+                border: "1px solid #e5e7eb",
+              }}
             />
 
             <Legend
-              layout="vertical"
-              verticalAlign="middle"
-              align="right"
-              formatter={(value, entry, index) => {
+              layout={isMobile ? "horizontal" : "vertical"}
+              verticalAlign={isMobile ? "bottom" : "middle"}
+              align={isMobile ? "center" : "right"}
+              wrapperStyle={{
+                paddingTop: isMobile ? 12 : 0,
+                fontSize: "12px",
+              }}
+              formatter={(value) => {
                 const total = items.length;
                 const count = categoryCount[value];
+
                 const percentage = total
                   ? Math.round((count / total) * 100)
                   : 0;
 
-                return `${value}  ${percentage}%`;
+                return `${value} ${percentage}%`;
               }}
             />
-        </PieChart>
+          </PieChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );

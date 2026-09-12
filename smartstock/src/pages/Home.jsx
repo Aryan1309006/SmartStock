@@ -173,7 +173,7 @@ const Home = () => {
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
-                to="/register"
+                to="/login"
                 className="flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-7 py-3.5 font-semibold text-white shadow-lg shadow-emerald-100 transition hover:bg-emerald-600"
               >
                 Get Started

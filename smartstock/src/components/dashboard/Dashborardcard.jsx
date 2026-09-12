@@ -28,9 +28,9 @@ const Dashborardcard = ({ item = [], name, type }) => {
       <div className="space-y-3">
 
         {item.slice(0,slice).map((product) => (
-            <Link to={`/inventory/${product._id}`}>
+          <Link to={`/inventory/${product._id}`}  key={product._id}>
           <div
-            key={product._id}
+           
             className="flex items-center justify-between rounded-xl bg-gray-50 p-4 transition hover:bg-gray-100"
           >
 
@@ -85,7 +85,7 @@ const Dashborardcard = ({ item = [], name, type }) => {
                 </span>
               )}
           </div>
-          </Link>
+              </Link>
         ))}
       </div>
 
