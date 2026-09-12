@@ -70,16 +70,7 @@ const Inventory = () => {
   return (
     <div className="min-h-screen w-full bg-gray-50 p-3 sm:p-5 lg:p-6">
       {/* PAGE HEADER */}
-      <div className="mb-5">
-        <h1 className="text-2xl font-bold text-gray-800 sm:text-3xl">
-          Inventory
-        </h1>
-
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          Manage and track all your items in one place.
-        </p>
-      </div>
-
+   
       {/* FILTER CARD */}
       <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="mb-4 flex items-center gap-2">

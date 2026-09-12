@@ -11,7 +11,7 @@ const DashboardLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen flex-col overflow-x-hidden bg-gray-50 text-gray-800 lg:pl-72">
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-gray-50 text-gray-800 lg:pl-20">
       <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
 
       <main className="flex-1 px-4 py-4 sm:p-6">

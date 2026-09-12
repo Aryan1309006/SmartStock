@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-import logo from "../assets/SmartStockLogo.svg"
+import logo from "../assets/SmartStockLogo.svg";
+import boxLogo from "../assets/smartstock-box-logo.svg";
 import {
   LayoutDashboard,
   Package,
@@ -8,6 +9,9 @@ import {
   User,
   Settings,
   LogOut,
+  BellDot,
+  ChartNoAxesColumn,
+  ChartNoAxesCombined,
 } from "lucide-react";
 export const navOption = [
   {
@@ -19,15 +23,16 @@ export const navOption = [
     component: "Inventory",
     link: "/inventory",
     icon: Package,
-  },{
+  },
+  {
     component: "Analytics",
     link: "/analytics",
-    icon: Plus,
+    icon: ChartNoAxesCombined,
   },
   {
     component: "Notification",
     link: "/notification",
-    icon: User,
+    icon: BellDot,
   },
 ];
 const Sidebar = ({ open, setOpen }) => {
@@ -41,9 +46,20 @@ const Sidebar = ({ open, setOpen }) => {
         className="fixed inset-0 z-40 bg-black/30 lg:hidden"
       />
     )}
-    <aside className={`fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-gray-200 bg-white px-4 py-7 transition-transform duration-200 lg:w-70 lg:translate-x-0 lg:pr-10 ${open ? "translate-x-0" : "-translate-x-full"}`}>
-      <div className="h-20"><img src={logo} alt="SmartStock Logo" className="h-15" /></div>
-      <div className="flex flex-col gap-1 font-semibold lg:mb-75">
+    <aside className={`group fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-gray-200 bg-white px-4 py-7 shadow-sm transition-[width,transform,padding,box-shadow] duration-300 ease-in-out lg:w-20 lg:translate-x-0 lg:px-3 lg:hover:w-72 lg:hover:px-4 lg:hover:shadow-lg ${open ? "translate-x-0" : "-translate-x-full"}`}>
+      <div className="relative flex h-20 items-center overflow-hidden">
+        <img
+          src={boxLogo}
+          alt="SmartStock"
+          className="h-12 w-12 shrink-0 object-contain transition-all duration-300 ease-in-out lg:opacity-100 lg:group-hover:scale-95 lg:group-hover:opacity-0"
+        />
+        <img
+          src={logo}
+          alt="SmartStock"
+          className="absolute left-0 h-15 w-auto max-w-none opacity-100 transition-all duration-300 ease-in-out lg:translate-x-2 lg:opacity-0 lg:group-hover:translate-x-0 lg:group-hover:opacity-100"
+        />
+      </div>
+      <div className="flex flex-col gap-1 font-semibold">
         {navOption.map((item) => {
           const Icon = item.icon;
 
@@ -52,14 +68,14 @@ const Sidebar = ({ open, setOpen }) => {
               to={item.link}
               key={item.link}
               onClick={() => setOpen(false)}
-              className={({ isActive }) =>`flex rounded-xl items-center gap-4  ${
+              className={({ isActive }) =>`flex items-center justify-center gap-4 rounded-xl p-2 transition-colors duration-200 lg:justify-center lg:group-hover:justify-start ${
                   isActive
                     ? "bg-emerald-100 text-emerald-500"
                     : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                }  p-2`}
+                }`}
             >
               <Icon size={20} />
-              <span>{item.component}</span>
+              <span className="lg:invisible lg:w-0 lg:translate-x-2 lg:opacity-0 lg:transition-[width,transform,opacity] lg:duration-300 lg:group-hover:visible lg:group-hover:w-auto lg:group-hover:translate-x-0 lg:group-hover:opacity-100">{item.component}</span>
             </NavLink>
           );
         })}
@@ -69,20 +85,20 @@ const Sidebar = ({ open, setOpen }) => {
           <Link
             to="/settings"
             onClick={() => setOpen(false)}
-            className={`flex rounded-xl font-semibold items-center gap-3 text-gray-500 
+              className={`flex items-center justify-center gap-3 rounded-xl p-2 font-semibold text-gray-500 lg:justify-center lg:group-hover:justify-start
              
-              hover:text-green-300 hover:bg-emerald-100 p-2`}
+              hover:bg-emerald-100 hover:text-green-300`}
           >
             <Settings size={20} />
-            <span>Settings</span>
+            <span className="lg:invisible lg:w-0 lg:opacity-0 lg:transition-opacity lg:group-hover:visible lg:group-hover:w-auto lg:group-hover:opacity-100">Settings</span>
           </Link>
           <Link
             to="/profile"
             onClick={() => setOpen(false)}
-            className="flex rounded-xl font-semibold items-center gap-3 text-gray-500  hover:text-green-300 hover:bg-emerald-100 p-2"
+            className="flex items-center justify-center gap-3 rounded-xl p-2 font-semibold text-gray-500 hover:bg-emerald-100 hover:text-green-300 lg:justify-center lg:group-hover:justify-start"
           >
             <User size={20} />
-            <span>Profile</span>
+            <span className="lg:invisible lg:w-0 lg:opacity-0 lg:transition-opacity lg:group-hover:visible lg:group-hover:w-auto lg:group-hover:opacity-100">Profile</span>
           </Link>
         </div>
 
@@ -91,10 +107,10 @@ const Sidebar = ({ open, setOpen }) => {
           <Link
             to="/logout"
             onClick={() => setOpen(false)}
-            className="flex rounded-xl items-center gap-3 font-semibold text-gray-500  hover:text-red-300 hover:bg-red-100 p-2"
+            className="flex items-center justify-center gap-3 rounded-xl p-2 font-semibold text-gray-500 hover:bg-red-100 hover:text-red-300 lg:justify-center lg:group-hover:justify-start"
           >
             <LogOut size={20} />
-            <span>log out</span>
+            <span className="lg:invisible lg:w-0 lg:opacity-0 lg:transition-opacity lg:group-hover:visible lg:group-hover:w-auto lg:group-hover:opacity-100">Log out</span>
           </Link>
         </div>
 

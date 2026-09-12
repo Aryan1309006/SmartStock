@@ -172,7 +172,7 @@ const Item = () => {
   // UI
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 pb-10 pt-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 px-3 pb-8 pt-3 sm:px-6 sm:pb-10 sm:pt-4 lg:px-8">
       <div className="mx-auto max-w-6xl">
         <button
           onClick={() => navigate("/inventory")}
@@ -182,20 +182,20 @@ const Item = () => {
           Back to Inventory
         </button>
 
-        <div className="mt-6 overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
-          <div className="flex flex-col gap-6 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-start gap-4">
+        <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm sm:mt-6 sm:rounded-3xl">
+          <div className="flex flex-col gap-4 p-4 sm:gap-6 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex min-w-0 items-start gap-3 sm:gap-4">
               <img
                 src={categoryImages?.[item.category]}
                 alt={item.name}
-                className="h-20 w-20 rounded-2xl border border-gray-100 object-cover shadow-sm sm:h-24 sm:w-24"
+                className="h-16 w-16 shrink-0 rounded-xl border border-gray-100 object-cover shadow-sm sm:h-24 sm:w-24 sm:rounded-2xl"
               />
 
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm font-medium uppercase tracking-[0.12em] text-emerald-600">
                   Inventory Item
                 </p>
-                <h1 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
+                <h1 className="mt-1 truncate text-xl font-bold text-gray-900 sm:mt-2 sm:text-3xl">
                   {item.name}
                 </h1>
 
@@ -213,10 +213,10 @@ const Item = () => {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
               <button
                 onClick={handleEdit}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-blue-500 px-4 py-2.5 text-sm font-medium text-blue-500 transition hover:bg-blue-500 hover:text-white"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-blue-500 px-3 py-2 text-sm font-medium text-blue-500 transition hover:bg-blue-500 hover:text-white sm:w-auto sm:px-4 sm:py-2.5"
               >
                 <Pencil size={17} />
                 Edit Item
@@ -224,7 +224,7 @@ const Item = () => {
 
               <button
                 onClick={handleDelete}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-500 px-4 py-2.5 text-sm font-medium text-red-500 transition hover:bg-red-500 hover:text-white"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-500 px-3 py-2 text-sm font-medium text-red-500 transition hover:bg-red-500 hover:text-white sm:w-auto sm:px-4 sm:py-2.5"
               >
                 <Trash2 size={17} />
                 Delete Item
@@ -233,8 +233,8 @@ const Item = () => {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="mt-4 grid gap-4 sm:mt-6 sm:gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm text-gray-500">Expires in</p>
@@ -293,7 +293,7 @@ const Item = () => {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6">
             <div className="mb-6 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
                 <Package size={18} className="text-blue-500" />
@@ -341,14 +341,14 @@ const Item = () => {
           </div>
         </div>
 
-        <div className="mt-6 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:mt-6 sm:rounded-3xl sm:p-6">
           <h2 className="text-lg font-bold text-gray-900">Notes</h2>
           <p className="mt-3 leading-7 text-gray-600">
             {item.notes || "No notes added for this item."}
           </p>
         </div>
 
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-4 flex flex-col gap-2 sm:mt-6 sm:flex-row sm:gap-3">
           <button
             onClick={handleConsumed}
             className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"

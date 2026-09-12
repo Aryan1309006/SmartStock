@@ -7,9 +7,11 @@ import Settings from "./pages/Settings";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Login from "./components/auth/Login";
+import Signin from "./components/auth/Signin";
 import Item from "./components/Inventory/Item";
 import Loader from "./components/Loader";
 import Footer from "./components/Footer";
+import Home from "./pages/Home";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -30,7 +32,10 @@ const App = () => {
     <div>
       <Routes>
         {/* Public */}
+        <Route path="/" element={<Home />} />
+
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Signin />} />
 
         {/* Dashboard Layout */}
         <Route element={<DashboardLayout />}>

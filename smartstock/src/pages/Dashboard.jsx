@@ -16,6 +16,7 @@ import {
 
 import Dashborardcard from "../components/dashboard/Dashborardcard";
 import { Link } from "react-router-dom";
+import CategoryChart from "../components/dashboard/CategoryChart";
 
 const Dashboard = () => {
   const user = dummyUser;
@@ -136,7 +137,7 @@ const Dashboard = () => {
           </div>
 
           <p className="mt-5 text-3xl font-bold text-gray-900">
-            {dashboard.expiringSoon}
+            {dashboard.expiringItems}
           </p>
         </div>
 
@@ -182,15 +183,9 @@ const Dashboard = () => {
         />
 
         {/* Analytics */}
-        <div className="min-h-[300px] rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-bold text-gray-900">
-            Analytics
-          </h2>
-
-          <div className="flex h-56 items-center justify-center text-sm text-gray-400">
-            Analytics coming soon
-          </div>
-        </div>
+        {/* <div className="min-h-[300px] rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"> */}
+          <CategoryChart items={items} />
+        {/* </div> */}
 
         {/* Recently Consumed */}
         <Dashborardcard
