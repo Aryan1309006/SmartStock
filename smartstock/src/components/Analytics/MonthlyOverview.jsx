@@ -62,10 +62,7 @@ const MonthlyOverview = ({ items = [] }) => {
     0,
   );
 
-  // =====================================
   // CHART DATA
-  // =====================================
-
   const createMonthlyData = () => {
     const monthlyData = {};
 

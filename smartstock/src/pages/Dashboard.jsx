@@ -37,10 +37,7 @@ const Dashboard = () => {
     .filter((item) => item.daysRemaining <= 7)
     .sort((a, b) => a.daysRemaining - b.daysRemaining);
 
-  // =========================
   // RECENTLY CONSUMED
-  // =========================
-
   const recentlyConsumed = items
     .filter((item) => item.consumedAt !== null)
     .sort(
