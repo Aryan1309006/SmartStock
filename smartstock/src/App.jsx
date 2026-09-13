@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "./components/Sidebar";
 import DashboardLayout from "./Layouts/DashboardLayout";
 import Inventory from "./pages/Inventory";
 import Analytics from "./pages/Analytics";
@@ -10,9 +9,11 @@ import Login from "./components/auth/Login";
 import Signin from "./components/auth/Signin";
 import Item from "./components/Inventory/Item";
 import Loader from "./components/Loader";
-import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Notifications from "./pages/Notifications";
+import AISuggestion from "./pages/AISuggestion";
+import { RecipeProvider } from "./context/recipeContext";
+import { NotificationProvider } from "./context/notificationContext";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -44,8 +45,23 @@ const App = () => {
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/notification" element={<Notifications />} />
+          <Route
+            path="/notification"
+            element={
+              <NotificationProvider>
+                <Notifications />
+              </NotificationProvider>
+            }
+          />
           <Route path="/inventory/:id" element={<Item />} />
+          <Route
+            path="/suggestion"
+            element={
+              <RecipeProvider>
+                <AISuggestion />
+              </RecipeProvider>
+            }
+          />
         </Route>
         {/* Default */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

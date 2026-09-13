@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     const data = await loginUser(credentials.email, credentials.password);
 
-    setUser(data.user);
+    setUser(data.data?.user ?? data.user);
 
     return data;
   };
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
       userData.password,
     );
 
-    setUser(data.user);
+    setUser(data.data?.user ?? data.user);
 
     return data;
   };

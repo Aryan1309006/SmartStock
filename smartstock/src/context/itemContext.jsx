@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import {
   createItem,
   getAllItems,
+  getItemById,
   updateItem,
   deleteItem,
   markItemConsumed,
@@ -14,6 +15,7 @@ const ItemContext = createContext(null);
 export const ItemProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [error, setError] = useState(null);
 
   // Load the current user's items and expose request errors to the UI.
@@ -38,7 +40,9 @@ export const ItemProvider = ({ children }) => {
 
       const data = await getItemById(id);
 
-      setItems(data.data?.items ?? data.items ?? []);
+      const item = data.data?.item ?? data.item ?? null;
+      setSelectedItem(item);
+      return item;
     } catch (error) {
       setError(error.response?.data?.message || "Failed to fetch items");
     } finally {
@@ -126,10 +130,12 @@ export const ItemProvider = ({ children }) => {
 
   const value = {
     items,
+    selectedItem,
     loading,
     error,
 
     fetchItems,
+    fetchSingleItem,
     addItem,
     editItem,
     removeItem,

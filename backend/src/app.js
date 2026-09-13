@@ -13,7 +13,9 @@ app.use(cors);
 app.use("/api/auth", require("./routes/auth.route"));
 app.use("/api/dashboard", require("./routes/dashboard.route"));
 app.use("/api/items", require("./routes/items.route"));
+app.use("/api/notifications", require("./routes/notifications.route"));
 app.use("/api/analytics", require("./routes/analytics.route"));
+app.use("/api/recipes", require("./routes/suggest.route"));
 app.get("/", (req, res) => {
   res.json({
     success: true,

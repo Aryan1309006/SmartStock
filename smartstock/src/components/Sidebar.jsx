@@ -10,8 +10,8 @@ import {
   Settings,
   LogOut,
   BellDot,
-  ChartNoAxesColumn,
   ChartNoAxesCombined,
+  Sparkles,
 } from "lucide-react";
 export const navOption = [
   {
@@ -28,6 +28,11 @@ export const navOption = [
     component: "Analytics",
     link: "/analytics",
     icon: ChartNoAxesCombined,
+  },
+  {
+    component: "AI Suggestions",
+    link: "/suggestion",
+    icon: Sparkles,
   },
   {
     component: "Notification",

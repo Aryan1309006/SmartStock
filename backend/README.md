@@ -24,6 +24,7 @@ Create `backend/.env`:
 ```env
 MONGO_URI=mongodb://127.0.0.1:27017/smartstock
 JWT_SECRET=replace_with_a_long_random_secret
+GROQ_API_KEY=replace_with_your_groq_api_key
 PORT=3000
 NODE_ENV=development
 ```
@@ -48,7 +49,7 @@ The token expires after one day. In production, the cookie uses `Secure` and `Sa
 
 ## API Routes
 
-All routes below are relative to `http://localhost:3000`.
+All routes below are relative to `http://localhost:3000` and require a bearer token unless marked `No`.
 
 ### Authentication
 
@@ -58,6 +59,21 @@ All routes below are relative to `http://localhost:3000`.
 | POST | `/api/auth/login` | No | Authenticate a user and issue a token |
 | GET | `/api/auth/me` | Yes | Return the authenticated user |
 | POST | `/api/auth/logout` | Yes | Clear the authentication cookie |
+
+Register and login return the user and token inside `data`:
+
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": { "id": "user_id", "name": "John Doe", "email": "john@example.com" },
+    "token": "jwt"
+  }
+}
+```
+
+`GET /api/auth/me` returns the authenticated user at `user`. Logout returns `success` and `message`.
 
 Register request:
 
@@ -78,24 +94,14 @@ Login request:
 }
 ```
 
-Successful registration and login responses contain `success`, `message`, and `data.user`, with the token at `data.token`. The current-user response returns the user at `user`:
-
-```json
-{
-  "success": true,
-  "user": {
-    "_id": "user_id",
-    "name": "John Doe",
-    "email": "john@example.com"
-  }
-}
-```
-
 ### Dashboard
 
 | Method | Endpoint | Auth | Description |
 | --- | --- | --- | --- |
 | GET | `/api/dashboard` | Yes | Return inventory statistics |
+| GET | `/api/dashboard/expiring-soon` (new) | Yes | Return active items expiring within seven days, sorted soonest first |
+| GET | `/api/dashboard/recently-consumed` (new) | Yes | Return consumed items sorted by consumption date |
+| GET | `/api/dashboard/category-count` (new) | Yes | Return active inventory grouped by category |
 
 Response data contains `totalItems`, `freshItems`, `consumedItems`, `expiringItems`, `expiredItems`, and `inventoryValue`.
 
@@ -141,6 +147,47 @@ Item responses use this structure:
 
 List responses contain the items at `data.items` and are sorted newest first. Item IDs must be valid MongoDB ObjectIds.
 
+### Analytics (new)
+
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| GET | `/api/analytics/monthly-overview` (new) | Yes | Return the current-month summary and monthly added/consumed chart data |
+| GET | `/api/analytics/consumption-overview` (new) | Yes | Return daily added and consumed chart data |
+
+`monthly-overview` returns `data.summary` (`added`, `consumed`, `expired`, `value`) and `data.chartData`. `consumption-overview` returns `data.chartData`.
+
+### Recipe Suggestions (new)
+
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| POST | `/api/recipes/suggest` (new) | Yes | Generate recipes from the user's active food inventory using the configured Groq AI service |
+
+Request body:
+
+```json
+{
+  "preferences": "vegetarian",
+  "servings": 2,
+  "avoid": ["peanuts"]
+}
+```
+
+`servings` must be a positive integer and `avoid` must be an array. The response returns AI-generated recipe data at `data`. Set `GROQ_API_KEY` in `backend/.env` to use this endpoint.
+
+## SmartStock Frontend Integration
+
+The frontend uses `smartstock/src/services/api.js` with `VITE_API_URL` as its API base URL and `withCredentials: true`.
+
+| Backend area | Used by SmartStock frontend now? | Current integration |
+| --- | --- | --- |
+| Authentication | Yes | `authService.js` uses register, login, and logout; `authContext.jsx` uses `/auth/me` |
+| Items | Yes | `itemsService.js` and `itemContext.jsx` use create, list, get, update, delete, consume, and restore |
+| Dashboard | No | No frontend service or direct API call currently found |
+| Analytics | No | No frontend service or direct API call currently found |
+| Recipe suggestions | No | No frontend service or direct API call currently found |
+
+The `(new)` routes are implemented in the backend but still need frontend service methods and UI integration before SmartStock uses them.
+
 ## Error Responses
 
 Errors use this structure:
@@ -172,6 +219,19 @@ Common status codes:
 
 ### Item
 
+
+### Notifications
+
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| GET | `/api/notifications` | Yes | Synchronize and return the user's inventory notifications |
+| PATCH | `/api/notifications/:id/read` | Yes | Mark one notification as read |
+| PATCH | `/api/notifications/read-all` | Yes | Mark all notifications as read |
+| DELETE | `/api/notifications/:id` | Yes | Delete one notification |
+
+Notifications are generated from inventory events such as newly added items,
+consumed items, and items that are expiring or expired. Notification state is
+stored per user and is loaded by the frontend notifications page.
 - `_id`: MongoDB ObjectId
 - `userId`: required User reference
 - `name`: required string
@@ -195,21 +255,26 @@ backend/
 └── src/
     ├── app.js
     ├── config/
+    │   ├── Ai.js
     │   ├── cors.js
     │   └── db.js
     ├── controllers/
+    │   ├── analyticsController.js
     │   ├── authController.js
     │   ├── dashboardController.js
-    │   └── itemsController.js
+    │   ├── itemsController.js
+    │   └── suggestRecipesController.js
     ├── middleware/
     │   └── authMiddleware.js
     ├── models/
     │   ├── item.js
     │   └── user.js
     └── routes/
+      ├── analytics.route.js
         ├── auth.route.js
         ├── dashboard.route.js
-        └── items.route.js
+      ├── items.route.js
+      └── suggest.route.js
 ```
 
 ## Available Script

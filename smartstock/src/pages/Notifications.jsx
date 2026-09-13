@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Bell,
   Check,
@@ -9,141 +8,32 @@ import {
   Trash2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { dummyItems } from "../assets/dummydata/item";
-
-const MS_PER_DAY = 1000 * 60 * 60 * 24;
-
-const parseDate = (dateValue) => {
-  if (!dateValue) return null;
-
-  const date = new Date(`${dateValue}T00:00:00`);
-  return Number.isNaN(date.getTime()) ? null : date;
-};
-
-const formatDate = (dateValue) => {
-  const date = parseDate(dateValue);
-
-  return date
-    ? date.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      })
-    : "an unknown date";
-};
+import { useNotifications } from "../context/notificationContext";
 
 const getRelativeTime = (dateValue) => {
   const date = new Date(dateValue);
-  const daysAgo = Math.floor((Date.now() - date.getTime()) / MS_PER_DAY);
+  if (Number.isNaN(date.getTime())) return "Recently";
+
+  const daysAgo = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
 
   if (daysAgo <= 0) return "Today";
   if (daysAgo === 1) return "Yesterday";
   return `${daysAgo} days ago`;
 };
 
-const createNotifications = (items) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  return items
-    .flatMap((item) => {
-      const expiryDate = parseDate(item.expiryDate);
-      const daysUntilExpiry = expiryDate
-        ? Math.ceil((expiryDate - today) / MS_PER_DAY)
-        : null;
-      const notifications = [];
-
-      if (item.consumedAt) {
-        notifications.push({
-          id: `${item._id}-consumed`,
-          itemId: item._id,
-          type: "consumed",
-          title: `${item.name} was consumed`,
-          message: `${item.quantity} ${item.quantity === 1 ? "unit" : "units"} marked as consumed.`,
-          time: getRelativeTime(item.consumedAt),
-          unread: false,
-          date: new Date(item.consumedAt),
-        });
-      } else if (daysUntilExpiry !== null && daysUntilExpiry < 0) {
-        notifications.push({
-          id: `${item._id}-expired`,
-          itemId: item._id,
-          type: "expired",
-          title: `${item.name} has expired`,
-          message: `This item expired on ${formatDate(item.expiryDate)}.`,
-          time: `${Math.abs(daysUntilExpiry)} ${Math.abs(daysUntilExpiry) === 1 ? "day" : "days"} ago`,
-          unread: true,
-          date: expiryDate,
-        });
-      } else if (daysUntilExpiry !== null && daysUntilExpiry <= 3) {
-        notifications.push({
-          id: `${item._id}-expiring`,
-          itemId: item._id,
-          type: "expiring",
-          title: `${item.name} is expiring soon`,
-          message:
-            daysUntilExpiry === 0
-              ? "This item expires today."
-              : `This item will expire in ${daysUntilExpiry} ${daysUntilExpiry === 1 ? "day" : "days"}.`,
-          time: formatDate(item.expiryDate),
-          unread: true,
-          date: expiryDate,
-        });
-      }
-
-      const createdDate = new Date(item.createdAt);
-      if (!Number.isNaN(createdDate.getTime())) {
-        notifications.push({
-          id: `${item._id}-added`,
-          itemId: item._id,
-          type: "added",
-          title: "New item added",
-          message: `${item.name} was added to your inventory.`,
-          time: getRelativeTime(item.createdAt),
-          unread: false,
-          date: createdDate,
-        });
-      }
-
-      return notifications;
-    })
-    .sort((a, b) => b.date - a.date)
-    .slice(0, 10);
-};
-
 const Notifications = () => {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = React.useState(() =>
-    createNotifications(dummyItems?.data?.items || []),
-  );
-
-  const markAsRead = (id) => {
-    setNotifications((prev) =>
-      prev.map((notification) =>
-        notification.id === id
-          ? { ...notification, unread: false }
-          : notification,
-      ),
-    );
-  };
-
-  const markAllAsRead = () => {
-    setNotifications((prev) =>
-      prev.map((notification) => ({
-        ...notification,
-        unread: false,
-      })),
-    );
-  };
-
-  const deleteNotification = (id) => {
-    setNotifications((prev) =>
-      prev.filter((notification) => notification.id !== id),
-    );
-  };
+  const {
+    notifications,
+    loading,
+    error,
+    markAsRead,
+    markAllAsRead,
+    removeNotification,
+  } = useNotifications();
 
   const viewItem = (notification) => {
-    markAsRead(notification.id);
+    markAsRead(notification._id);
     navigate(`/inventory/${notification.itemId}`);
   };
 
@@ -186,9 +76,7 @@ const Notifications = () => {
     }
   };
 
-  const unreadCount = notifications.filter(
-    (notification) => notification.unread,
-  ).length;
+  const unreadCount = notifications.filter((notification) => !notification.read).length;
 
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4 sm:p-6">
@@ -237,7 +125,15 @@ const Notifications = () => {
 
         {/* Notifications */}
         <div>
-          {notifications.length === 0 ? (
+          {loading ? (
+            <div className="py-16 text-center text-sm text-gray-500">
+              Loading notifications...
+            </div>
+          ) : error ? (
+            <div className="py-16 text-center text-sm text-red-600">
+              {error}
+            </div>
+          ) : notifications.length === 0 ? (
             <div className="py-16 text-center">
               <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
                 <Bell className="text-gray-400" />
@@ -254,12 +150,12 @@ const Notifications = () => {
           ) : (
             notifications.map((notification) => (
               <div
-                key={notification.id}
+                key={notification._id}
                 className={`group flex items-start gap-4 px-5 py-4
                   border-b border-gray-100 last:border-b-0
                   transition
                   ${
-                    notification.unread
+                    !notification.read
                       ? "bg-emerald-50/40"
                       : "bg-white hover:bg-gray-50"
                   }`}
@@ -278,7 +174,7 @@ const Notifications = () => {
                           {notification.title}
                         </h3>
 
-                        {notification.unread && (
+                        {!notification.read && (
                           <span className="w-2 h-2 rounded-full bg-emerald-500" />
                         )}
                       </div>
@@ -288,14 +184,14 @@ const Notifications = () => {
                       </p>
 
                       <p className="text-xs text-gray-400 mt-2">
-                        {notification.time}
+                        {getRelativeTime(notification.occurredAt)}
                       </p>
                     </div>
 
                     {/* Delete */}
                     <button
                       onClick={() =>
-                        deleteNotification(notification.id)
+                        removeNotification(notification._id)
                       }
                       className="opacity-0 group-hover:opacity-100
                                  p-2 rounded-lg text-gray-400
@@ -310,11 +206,11 @@ const Notifications = () => {
                   <div className="flex items-center gap-4 mt-3">
 
                     <button
-                      onClick={() => markAsRead(notification.id)}
+                      onClick={() => markAsRead(notification._id)}
                       className="text-xs font-medium text-emerald-600
                                  hover:text-emerald-700"
                     >
-                      {notification.unread
+                      {!notification.read
                         ? "Mark as read"
                         : "Read"}
                     </button>
