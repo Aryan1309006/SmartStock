@@ -1,19 +1,50 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import google from "../../assets/images/Google.png";
 import bgImg from "../../assets/images/loginBackground.png";
+import { useAuth } from "../../context/authContext";
 
 const Login = () => {
   const [tab, setTab] = React.useState("login");
+  const [formData, setFormData] = React.useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [error, setError] = React.useState("");
+  const [submitting, setSubmitting] = React.useState(false);
+  const { login, register } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((currentData) => ({ ...currentData, [name]: value }));
+  };
 
-    if (tab === "login") {
-      console.log("Login");
-      // send login data to backend
-    } else {
-      console.log("Signup");
-      // send signup data to backend
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+
+    try {
+      if (tab === "login") {
+        await login({
+          email: formData.email,
+          password: formData.password,
+        });
+      } else {
+        await register(formData);
+      }
+
+      navigate("/dashboard");
+    } catch (requestError) {
+      setError(
+        requestError.response?.data?.message ||
+          requestError.message ||
+          "Authentication failed. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -117,9 +148,12 @@ const Login = () => {
           <div className="flex w-full flex-col items-center gap-5">
             {/* Email */}
             <input
+              name="email"
               type="email"
               placeholder="Email"
               autoComplete="email"
+              value={formData.email}
+              onChange={handleChange}
               required
               className="
                 h-11 w-full max-w-xs
@@ -142,9 +176,12 @@ const Login = () => {
 
             {/* Password */}
             <input
+              name="password"
               type="password"
               placeholder="Password"
               autoComplete="current-password"
+              value={formData.password}
+              onChange={handleChange}
               required
               className="
                 h-11 w-full max-w-xs
@@ -168,6 +205,7 @@ const Login = () => {
             {/* Login Button */}
             <button
               type="submit"
+              disabled={submitting}
               className="
                 h-11 w-full max-w-xs
                 rounded-lg
@@ -182,16 +220,19 @@ const Login = () => {
                 sm:text-base
               "
             >
-              Log In
+              {submitting ? "Logging in..." : "Log In"}
             </button>
           </div>
         ) : (
           <div className="flex w-full flex-col items-center gap-5">
             {/* Name */}
             <input
+              name="name"
               type="text"
               placeholder="Name"
               autoComplete="name"
+              value={formData.name}
+              onChange={handleChange}
               required
               className="
                 h-11 w-full max-w-xs
@@ -214,9 +255,12 @@ const Login = () => {
 
             {/* Email */}
             <input
+              name="email"
               type="email"
               placeholder="Email"
               autoComplete="email"
+              value={formData.email}
+              onChange={handleChange}
               required
               className="
                 h-11 w-full max-w-xs
@@ -239,9 +283,12 @@ const Login = () => {
 
             {/* Password */}
             <input
+              name="password"
               type="password"
               placeholder="Password"
               autoComplete="new-password"
+              value={formData.password}
+              onChange={handleChange}
               required
               className="
                 h-11 w-full max-w-xs
@@ -265,6 +312,7 @@ const Login = () => {
             {/* Signup Button */}
             <button
               type="submit"
+              disabled={submitting}
               className="
                 h-11 w-full max-w-xs
                 rounded-lg
@@ -279,18 +327,22 @@ const Login = () => {
                 sm:text-base
               "
             >
-              Sign Up
+              {submitting ? "Signing up..." : "Sign Up"}
             </button>
           </div>
+        )}
+
+        {error && (
+          <p className="w-full max-w-xs text-center text-sm text-red-600">
+            {error}
+          </p>
         )}
 
         {/* Divider */}
         <div className="flex w-full max-w-xs items-center gap-3">
           <div className="h-px flex-1 bg-gray-200" />
 
-          <span className="text-sm font-normal text-gray-400">
-            or
-          </span>
+          <span className="text-sm font-normal text-gray-400">or</span>
 
           <div className="h-px flex-1 bg-gray-200" />
         </div>
@@ -313,15 +365,9 @@ const Login = () => {
             sm:text-base
           "
         >
-          <img
-            src={google}
-            alt="Google"
-            className="mr-2 h-5 w-5"
-          />
+          <img src={google} alt="Google" className="mr-2 h-5 w-5" />
 
-          <span>
-            Continue with Google
-          </span>
+          <span>Continue with Google</span>
         </button>
 
         {/* Bottom Text */}
@@ -332,9 +378,7 @@ const Login = () => {
 
           <button
             type="button"
-            onClick={() =>
-              setTab(tab === "login" ? "signup" : "login")
-            }
+            onClick={() => setTab(tab === "login" ? "signup" : "login")}
             className="font-semibold text-emerald-500 hover:text-emerald-600"
           >
             {tab === "login" ? "Sign up" : "Log in"}

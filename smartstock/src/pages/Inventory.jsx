@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 
-import { dummyItems } from "../assets/dummydata/item";
 import { categories, statuses } from "../assets/dummydata/constants";
 import Inventoryitem from "../components/Inventory/Inventoryitem";
+import { useItems } from "../context/itemContext";
 
 const Inventory = () => {
   const [category, setCategory] = useState("");
@@ -11,7 +11,8 @@ const Inventory = () => {
   const [sort, setSort] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const items = dummyItems?.data?.items || [];
+  const { items: allItems, loading, error } = useItems();
+  const items = allItems.filter((item) => item.status !== "consumed");
 
   const filteredItems = useMemo(() => {
     let filtered = [...items];
@@ -66,6 +67,14 @@ const Inventory = () => {
   };
 
   const hasFilters = searchTerm || category || status || sort;
+
+  if (loading) {
+    return <p className="p-6 text-gray-500">Loading inventory...</p>;
+  }
+
+  if (error) {
+    return <p className="p-6 text-red-600">{error}</p>;
+  }
 
   return (
     <div

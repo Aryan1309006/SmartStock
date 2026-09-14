@@ -101,7 +101,7 @@ const Statcard = ({ dashboard = {} }) => {
           </div>
 
           <p className="mt-5 text-3xl font-bold text-gray-900">
-            ₹{dashboard.inventoryValue}
+              ₹{Number(dashboard.inventoryValue || 0).toFixed(2)}
           </p>
         </div>
       </div>

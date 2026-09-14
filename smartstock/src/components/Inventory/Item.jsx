@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ArrowLeft,
   Pencil,
@@ -12,17 +12,68 @@ import {
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { dummyItems, categoryImages } from "../../assets/dummydata/item";
+import { categoryImages } from "../../assets/dummydata/item";
+import { useItems } from "../../context/itemContext";
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 const Item = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const {
+    items,
+    selectedItem,
+    loading,
+    error,
+    fetchSingleItem,
+    removeItem,
+    consumeItem,
+    editItem,
+  } = useItems();
+  const [editing, setEditing] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [editForm, setEditForm] = useState({
+    name: "",
+    category: "",
+    quantity: "",
+    purchaseDate: "",
+    expiryDate: "",
+    price: "",
+    notes: "",
+  });
 
-  const items = dummyItems?.data?.items || [];
+  const item =
+    items.find((currentItem) => String(currentItem._id) === String(id)) ||
+    (String(selectedItem?._id) === String(id) ? selectedItem : null);
 
-  const item = items.find((item) => String(item._id) === String(id));
+  useEffect(() => {
+    if (!item && id) {
+      fetchSingleItem(id);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (item) {
+      setEditForm({
+        name: item.name || "",
+        category: item.category || "",
+        quantity: item.quantity || "",
+        purchaseDate: item.purchaseDate || "",
+        expiryDate: item.expiryDate || "",
+        price: item.price || "",
+        notes: item.notes || "",
+      });
+    }
+  }, [item]);
+
+  if (loading && !item) {
+    return <p className="p-6 text-gray-500">Loading item...</p>;
+  }
+
+  if (error && !item) {
+    return <p className="p-6 text-red-600">{error}</p>;
+  }
 
   if (!item) {
     return (
@@ -146,27 +197,73 @@ const Item = () => {
 
   // Handlers
   const handleEdit = () => {
-    navigate(`/inventory/edit/${item._id}`);
+    setActionError("");
+    setEditing(true);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     const confirmed = window.confirm(
       `Are you sure you want to delete "${item.name}"?`,
     );
 
     if (!confirmed) return;
 
-    // Add your delete API logic here
-    console.log("Delete item:", item._id);
+    try {
+      setActionLoading(true);
+      setActionError("");
+      await removeItem(item._id);
+      navigate("/inventory");
+    } catch (requestError) {
+      setActionError(
+        requestError.response?.data?.message || "Failed to delete item",
+      );
+    } finally {
+      setActionLoading(false);
+    }
   };
 
-  const handleConsumed = () => {
-    // Add your consumed API logic here
-    console.log("Mark as consumed:", item._id);
+  const handleConsumed = async () => {
+    try {
+      setActionLoading(true);
+      setActionError("");
+      await consumeItem(item._id);
+    } catch (requestError) {
+      setActionError(
+        requestError.response?.data?.message || "Failed to mark item as consumed",
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleEditChange = (event) => {
+    const { name, value } = event.target;
+    setEditForm((currentForm) => ({ ...currentForm, [name]: value }));
+  };
+
+  const handleSaveEdit = async (event) => {
+    event.preventDefault();
+
+    try {
+      setActionLoading(true);
+      setActionError("");
+      await editItem(item._id, {
+        ...editForm,
+        quantity: Number(editForm.quantity),
+        price: Number(editForm.price),
+      });
+      setEditing(false);
+    } catch (requestError) {
+      setActionError(
+        requestError.response?.data?.message || "Failed to update item",
+      );
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const handleHistory = () => {
-    navigate(`/inventory/${item._id}/history`);
+    navigate("/history");
   };
 
   // UI
@@ -216,6 +313,7 @@ const Item = () => {
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
               <button
                 onClick={handleEdit}
+                disabled={actionLoading}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-blue-500 px-3 py-2 text-sm font-medium text-blue-500 transition hover:bg-blue-500 hover:text-white sm:w-auto sm:px-4 sm:py-2.5"
               >
                 <Pencil size={17} />
@@ -224,6 +322,7 @@ const Item = () => {
 
               <button
                 onClick={handleDelete}
+                disabled={actionLoading}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-500 px-3 py-2 text-sm font-medium text-red-500 transition hover:bg-red-500 hover:text-white sm:w-auto sm:px-4 sm:py-2.5"
               >
                 <Trash2 size={17} />
@@ -351,10 +450,15 @@ const Item = () => {
         <div className="mt-4 flex flex-col gap-2 sm:mt-6 sm:flex-row sm:gap-3">
           <button
             onClick={handleConsumed}
+            disabled={actionLoading || item.status === "consumed"}
             className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
           >
             <CheckCircle2 size={18} />
-            Mark as Consumed
+            {item.status === "consumed"
+              ? "Already Consumed"
+              : actionLoading
+                ? "Updating..."
+                : "Mark as Consumed"}
           </button>
 
           <button
@@ -365,6 +469,107 @@ const Item = () => {
             View History
           </button>
         </div>
+
+        {actionError && (
+          <p className="mt-4 text-sm text-red-600">{actionError}</p>
+        )}
+
+        {editing && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <form
+              onSubmit={handleSaveEdit}
+              className="max-h-[90vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">Edit Item</h2>
+                <button
+                  type="button"
+                  onClick={() => setEditing(false)}
+                  className="text-gray-500 hover:text-gray-900"
+                >
+                  Close
+                </button>
+              </div>
+
+              <input
+                name="name"
+                value={editForm.name}
+                onChange={handleEditChange}
+                required
+                placeholder="Item name"
+                className="w-full rounded-xl border border-gray-300 px-3 py-2"
+              />
+              <select
+                name="category"
+                value={editForm.category}
+                onChange={handleEditChange}
+                required
+                className="w-full rounded-xl border border-gray-300 px-3 py-2"
+              >
+                <option value="">Select category</option>
+                <option value="Dairy">Dairy</option>
+                <option value="Pantry">Pantry</option>
+                <option value="Medicine">Medicine</option>
+                <option value="Toiletries">Toiletries</option>
+                <option value="Cleaning">Cleaning</option>
+              </select>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <input
+                  name="quantity"
+                  type="number"
+                  min="1"
+                  value={editForm.quantity}
+                  onChange={handleEditChange}
+                  required
+                  placeholder="Quantity"
+                  className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                />
+                <input
+                  name="price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={editForm.price}
+                  onChange={handleEditChange}
+                  required
+                  placeholder="Price"
+                  className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                />
+                <input
+                  name="purchaseDate"
+                  type="date"
+                  value={editForm.purchaseDate}
+                  onChange={handleEditChange}
+                  required
+                  className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                />
+                <input
+                  name="expiryDate"
+                  type="date"
+                  value={editForm.expiryDate}
+                  onChange={handleEditChange}
+                  required
+                  className="w-full rounded-xl border border-gray-300 px-3 py-2"
+                />
+              </div>
+              <textarea
+                name="notes"
+                value={editForm.notes}
+                onChange={handleEditChange}
+                placeholder="Notes"
+                rows="3"
+                className="w-full rounded-xl border border-gray-300 px-3 py-2"
+              />
+              <button
+                type="submit"
+                disabled={actionLoading}
+                className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+              >
+                {actionLoading ? "Saving..." : "Save Changes"}
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );

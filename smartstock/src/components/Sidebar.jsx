@@ -5,6 +5,7 @@ import boxLogo from "../assets/smartstock-box-logo.svg";
 import {
   LayoutDashboard,
   Package,
+  History,
   Plus,
   User,
   Settings,
@@ -23,6 +24,11 @@ export const navOption = [
     component: "Inventory",
     link: "/inventory",
     icon: Package,
+  },
+  {
+    component: "History",
+    link: "/history",
+    icon: History,
   },
   {
     component: "Analytics",

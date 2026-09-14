@@ -8,8 +8,10 @@ import {
   IndianRupee,
   FileText,
 } from "lucide-react";
+import { useItems } from "../context/itemContext";
 
-const AddItem = ({ onClose, onAdd }) => {
+const AddItem = ({ onClose }) => {
+  const { addItem } = useItems();
   const [formData, setFormData] = React.useState({
     name: "",
     category: "",
@@ -19,6 +21,8 @@ const AddItem = ({ onClose, onAdd }) => {
     price: "",
     notes: "",
   });
+  const [error, setError] = React.useState("");
+  const [submitting, setSubmitting] = React.useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,8 +33,9 @@ const AddItem = ({ onClose, onAdd }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (
       !formData.name ||
@@ -40,7 +45,7 @@ const AddItem = ({ onClose, onAdd }) => {
       !formData.expiryDate ||
       !formData.price
     ) {
-      alert("Please fill all required fields");
+      setError("Please fill all required fields");
       return;
     }
 
@@ -54,16 +59,18 @@ const AddItem = ({ onClose, onAdd }) => {
       notes: formData.notes,
     };
 
-    console.log("New Item:", newItem);
-
-    // Send data to parent
-    if (onAdd) {
-      onAdd(newItem);
-    }
-
-    // Close popup
-    if (onClose) {
+    try {
+      setSubmitting(true);
+      await addItem(newItem);
       onClose();
+    } catch (requestError) {
+      setError(
+        requestError.response?.data?.message ||
+          requestError.message ||
+          "Failed to add item. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -273,6 +280,8 @@ const AddItem = ({ onClose, onAdd }) => {
           </div>
 
           {/* Buttons */}
+          {error && <p className="text-sm text-red-600">{error}</p>}
+
           <div className="flex gap-3 pt-2">
 
             <button
@@ -285,9 +294,10 @@ const AddItem = ({ onClose, onAdd }) => {
 
             <button
               type="submit"
+              disabled={submitting}
               className="flex-1 rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white transition hover:bg-emerald-700"
             >
-              Add Item
+              {submitting ? "Adding..." : "Add Item"}
             </button>
 
           </div>

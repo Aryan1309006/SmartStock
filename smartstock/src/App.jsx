@@ -12,8 +12,12 @@ import Loader from "./components/Loader";
 import Home from "./pages/Home";
 import Notifications from "./pages/Notifications";
 import AISuggestion from "./pages/AISuggestion";
+import History from "./pages/History";
+import Protected from "./routes/Protected";
 import { RecipeProvider } from "./context/recipeContext";
 import { NotificationProvider } from "./context/notificationContext";
+import { DashboardProvider } from "./context/dashboardContext";
+import { AnalyticsProvider } from "./context/analyticsContext";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -39,11 +43,29 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Signin />} />
 
-        {/* Dashboard Layout */}
-        <Route element={<DashboardLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+        {/* Protected dashboard routes */}
+        <Route element={<Protected />}>
+          <Route element={<DashboardLayout />}>
+          <Route
+            path="/dashboard"
+            element={
+              <DashboardProvider>
+                <Dashboard />
+              </DashboardProvider>
+            }
+          />
           <Route path="/inventory" element={<Inventory />} />
-          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/history" element={<History />} />
+          <Route
+            path="/analytics"
+            element={
+              <DashboardProvider>
+                <AnalyticsProvider>
+                  <Analytics />
+                </AnalyticsProvider>
+              </DashboardProvider>
+            }
+          />
           <Route path="/settings" element={<Settings />} />
           <Route
             path="/notification"
@@ -62,6 +84,7 @@ const App = () => {
               </RecipeProvider>
             }
           />
+          </Route>
         </Route>
         {/* Default */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

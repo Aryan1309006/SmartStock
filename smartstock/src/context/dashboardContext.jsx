@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+
 import {
   dashboardData,
   expiringSoon,
@@ -9,68 +10,73 @@ import {
 const DashboardContext = createContext(null);
 
 export const DashboardProvider = ({ children }) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   const [dashboard, setDashboard] = useState(null);
   const [expiringItems, setExpiringItems] = useState([]);
   const [recentlyConsumedItems, setRecentlyConsumedItems] = useState([]);
   const [categories, setCategories] = useState([]);
+
   const [error, setError] = useState(null);
 
-  const request = async (serviceCall, onSuccess, message) => {
+  const fetchAllDashboardData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await serviceCall();
-      onSuccess(response.data ?? {});
-      return response;
-    } catch (requestError) {
-      const messageFromApi = requestError.response?.data?.message;
-      setError(messageFromApi || message);
-      throw requestError;
+
+      const [
+        dashboardResponse,
+        expiringResponse,
+        consumedResponse,
+        categoryResponse,
+      ] = await Promise.all([
+        dashboardData(),
+        expiringSoon(),
+        recentlyConsumed(),
+        categoryCount(),
+      ]);
+
+      setDashboard(dashboardResponse.data ?? {});
+
+      setExpiringItems(
+        expiringResponse.data?.expiringSoon ?? []
+      );
+
+      setRecentlyConsumedItems(
+        consumedResponse.data?.recentlyConsumed ?? []
+      );
+
+      setCategories(
+        categoryResponse.data?.categories ?? []
+      );
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        "Failed to load dashboard data";
+
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchDashboard = () =>
-    request(dashboardData, setDashboard, "Failed to fetch dashboard data");
-
-  const fetchRecentlyConsumed = () =>
-    request(
-      recentlyConsumed,
-      (data) => setRecentlyConsumedItems(data.recentlyConsumed ?? []),
-      "Failed to fetch recently consumed items",
-    );
-
-  const fetchExpiringSoon = () =>
-    request(
-      expiringSoon,
-      (data) => setExpiringItems(data.expiringSoon ?? []),
-      "Failed to fetch expiring items",
-    );
-
-  const fetchCategoryCount = () =>
-    request(
-      categoryCount,
-      (data) => setCategories(data.categories ?? []),
-      "Failed to fetch category counts",
-    );
-
   useEffect(() => {
-    fetchDashboard();
+    fetchAllDashboardData();
   }, []);
 
   const value = {
     loading,
     error,
+
     dashboard,
     expiringItems,
     recentlyConsumedItems,
     categories,
-    fetchDashboard,
-    fetchRecentlyConsumed,
-    fetchExpiringSoon,
-    fetchCategoryCount,
+
+    fetchDashboard: fetchAllDashboardData,
+    fetchRecentlyConsumed: fetchAllDashboardData,
+    fetchExpiringSoon: fetchAllDashboardData,
+    fetchCategoryCount: fetchAllDashboardData,
   };
 
   return (
@@ -84,8 +90,10 @@ export const useDashboard = () => {
   const context = useContext(DashboardContext);
 
   if (!context) {
-    throw new Error("useDashboard must be used inside DashboardProvider");
-  };
+    throw new Error(
+      "useDashboard must be used inside DashboardProvider"
+    );
+  }
 
   return context;
 };

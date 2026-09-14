@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "./authContext";
 import {
   createItem,
   getAllItems,
@@ -13,6 +14,7 @@ const ItemContext = createContext(null);
 
 // Provide item state and CRUD actions to the component tree.
 export const ItemProvider = ({ children }) => {
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -125,8 +127,16 @@ export const ItemProvider = ({ children }) => {
 
   // Fetch items once when the provider is mounted.
   useEffect(() => {
+    if (authLoading) return;
+
+    if (!user) {
+      setItems([]);
+      setLoading(false);
+      return;
+    }
+
     fetchItems();
-  }, []);
+  }, [authLoading, user]);
 
   const value = {
     items,

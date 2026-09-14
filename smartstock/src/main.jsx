@@ -8,13 +8,14 @@ import { ItemProvider } from "./context/itemContext.jsx";
 import { BrowserRouter } from "react-router-dom";
 
 createRoot(document.getElementById("root")).render(
-  // <AuthProvider>
-  <StrictMode>
-    {/* <ItemProvider> */}
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-    {/* </ItemProvider> */}
-  </StrictMode>,
-  /* </AuthProvider>, */
+  <AuthProvider>
+    <StrictMode>
+      <ItemProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ItemProvider>
+    </StrictMode>
+    ,
+  </AuthProvider>,
 );

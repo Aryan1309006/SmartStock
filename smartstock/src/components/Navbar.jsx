@@ -8,6 +8,7 @@ const Navbar = ({ setOpen, setSidebarOpen }) => {
   const titles = {
     "/dashboard": "Dashboard",
     "/inventory": "Inventory",
+    "/history": "History",
     "/products": "Products",
     "/analytics": "Analytics",
     "/inventory/": "InventoryItem",

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
   monthlyOverview,
   consumptionOverview,
@@ -28,11 +28,7 @@ export const AnalyticsProvider = ({ children }) => {
   };
 
   const fetchMonthlyOverview = () =>
-    request(
-      monthlyOverview,
-      setMonthly,
-      "Failed to fetch monthly analytics",
-    );
+    request(monthlyOverview, setMonthly, "Failed to fetch monthly analytics");
 
   const fetchConsumptionOverview = () =>
     request(
@@ -44,6 +40,10 @@ export const AnalyticsProvider = ({ children }) => {
   const fetchAnalytics = async () => {
     await Promise.all([fetchMonthlyOverview(), fetchConsumptionOverview()]);
   };
+
+  useEffect(() => {
+    fetchAnalytics().catch(() => {});
+  }, []);
 
   const value = {
     monthly,
