@@ -58,8 +58,9 @@ const Sidebar = ({ open, setOpen }) => {
       />
     )}
     <aside className={`group fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-gray-200 bg-white px-4 py-7 shadow-sm transition-[width,transform,padding,box-shadow] duration-300 ease-in-out lg:w-20 lg:translate-x-0 lg:px-3 lg:hover:w-72 lg:hover:px-4 lg:hover:shadow-lg ${open ? "translate-x-0" : "-translate-x-full"}`}>
+      <Link to="/dashboard">
       <div className="relative flex h-20 items-center overflow-hidden">
-        <img
+         <img
           src={boxLogo}
           alt="SmartStock"
           className="h-12 w-12 shrink-0 object-contain transition-all duration-300 ease-in-out lg:opacity-100 lg:group-hover:scale-95 lg:group-hover:opacity-0"
@@ -69,7 +70,7 @@ const Sidebar = ({ open, setOpen }) => {
           alt="SmartStock"
           className="absolute left-0 h-15 w-auto max-w-none opacity-100 transition-all duration-300 ease-in-out lg:translate-x-2 lg:opacity-0 lg:group-hover:translate-x-0 lg:group-hover:opacity-100"
         />
-      </div>
+      </div></Link>
       <div className="flex flex-col gap-1 font-semibold">
         {navOption.map((item) => {
           const Icon = item.icon;
@@ -79,7 +80,7 @@ const Sidebar = ({ open, setOpen }) => {
               to={item.link}
               key={item.link}
               onClick={() => setOpen(false)}
-              className={({ isActive }) =>`flex items-center justify-center gap-4 rounded-xl p-2 transition-colors duration-200 lg:justify-center lg:group-hover:justify-start ${
+              className={({ isActive }) =>`flex items-center justify-start gap-4 rounded-xl p-2 transition-colors duration-200 lg:justify-center lg:group-hover:justify-start ${
                   isActive
                     ? "bg-emerald-100 text-emerald-500"
                     : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
@@ -118,7 +119,7 @@ const Sidebar = ({ open, setOpen }) => {
           <Link
             to="/logout"
             onClick={() => setOpen(false)}
-            className="flex items-center justify-center gap-3 rounded-xl p-2 font-semibold text-gray-500 hover:bg-red-100 hover:text-red-300 lg:justify-center lg:group-hover:justify-start"
+            className="flex items-center justify-center gap-3 rounded-xl p-2 font-semibold text-gray-500 hover:bg-red-100 hover:text-red-400 lg:justify-center lg:group-hover:justify-start"
           >
             <LogOut size={20} />
             <span className="lg:invisible lg:w-0 lg:opacity-0 lg:transition-opacity lg:group-hover:visible lg:group-hover:w-auto lg:group-hover:opacity-100">Log out</span>

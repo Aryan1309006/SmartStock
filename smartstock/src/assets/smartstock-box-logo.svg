@@ -1,23 +1,46 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title desc">
+  <title id="title">SmartStock Box Logo</title>
+  <desc id="desc">Green 3D inventory box with a white bar chart and check mark.</desc>
+
   <defs>
-    <linearGradient id="topGrad" x1="256" y1="80" x2="256" y2="230" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#12D889"/>
-      <stop offset="1" stop-color="#00A86B"/>
+    <linearGradient id="top" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#19e67a"/>
+      <stop offset="100%" stop-color="#00a66f"/>
     </linearGradient>
-    <linearGradient id="leftGrad" x1="95" y1="190" x2="255" y2="410" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#06B779"/>
-      <stop offset="1" stop-color="#008A58"/>
+    <linearGradient id="left" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#12d87a"/>
+      <stop offset="100%" stop-color="#00865f"/>
     </linearGradient>
-    <linearGradient id="rightGrad" x1="256" y1="190" x2="420" y2="410" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#009D67"/>
-      <stop offset="1" stop-color="#00784F"/>
+    <linearGradient id="right" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0fbe70"/>
+      <stop offset="100%" stop-color="#00694d"/>
     </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-opacity=".20"/>
+    </filter>
   </defs>
-  <path d="M256 62L430 151L256 239L82 151L256 62Z" fill="url(#topGrad)" stroke="#007A50" stroke-width="8" stroke-linejoin="round"/>
-  <path d="M82 151L256 239V430L82 340V151Z" fill="url(#leftGrad)" stroke="#007A50" stroke-width="8" stroke-linejoin="round"/>
-  <path d="M430 151L256 239V430L430 340V151Z" fill="url(#rightGrad)" stroke="#007A50" stroke-width="8" stroke-linejoin="round"/>
-  <rect x="124" y="282" width="25" height="58" rx="6" fill="white"/>
-  <rect x="163" y="250" width="25" height="90" rx="6" fill="white"/>
-  <rect x="202" y="218" width="25" height="122" rx="6" fill="white"/>
-  <path d="M300 291L337 328L397 242" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g transform="translate(54 54)" filter="url(#shadow)">
+    <path d="M196 20 C207 20 217 23 227 29 L337 91 C352 100 352 115 337 124 L227 186 C208 197 184 197 165 186 L55 124 C40 115 40 100 55 91 L165 29 C175 23 185 20 196 20Z"
+          fill="url(#top)"/>
+
+    <path d="M50 136 C42 131 33 137 33 147 L33 285 C33 299 40 310 53 318 L156 377 C168 384 179 378 179 365 L179 215 C179 205 175 198 166 193Z"
+          fill="url(#left)"/>
+
+    <path d="M342 136 C350 131 359 137 359 147 L359 285 C359 299 352 310 339 318 L236 377 C224 384 213 378 213 365 L213 215 C213 205 217 198 226 193Z"
+          fill="url(#right)"/>
+
+    <path d="M179 215 L196 225 L213 215"
+          fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+
+    <g fill="#fff">
+      <rect x="65" y="256" width="26" height="58" rx="6"/>
+      <rect x="103" y="232" width="26" height="104" rx="6"/>
+      <rect x="141" y="203" width="26" height="151" rx="6"/>
+    </g>
+
+    <path d="M257 275 L286 304 L332 237"
+          fill="none" stroke="#fff" stroke-width="23"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
 </svg>

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="500" viewBox="0 0 1600 500" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="500" viewBox="0 0 1800 500" role="img" aria-labelledby="title desc">
   <title id="title">SmartStock Logo</title>
   <desc id="desc">Horizontal SmartStock logo with a green cube icon, bar chart, and check mark.</desc>
 
@@ -26,69 +26,35 @@
 
   <!-- Icon -->
   <g transform="translate(50 70)" filter="url(#softShadow)">
-    <!-- subtle glow -->
     <ellipse cx="195" cy="350" rx="150" ry="24" fill="#5af0b2" opacity=".22"/>
 
-    <!-- top -->
-    <path d="M195 18
-             C205 18 214 20 223 25
-             L330 85
-             C345 94 345 108 330 117
-             L223 177
-             C205 187 185 187 167 177
-             L60 117
-             C45 108 45 94 60 85
-             L167 25
-             C176 20 185 18 195 18Z"
+    <path d="M195 18 C205 18 214 20 223 25 L330 85 C345 94 345 108 330 117 L223 177 C205 187 185 187 167 177 L60 117 C45 108 45 94 60 85 L167 25 C176 20 185 18 195 18Z"
           fill="url(#topGrad)"/>
 
-    <!-- left face -->
-    <path d="M55 128
-             C47 123 38 129 38 139
-             L38 275
-             C38 289 45 300 57 307
-             L157 364
-             C168 370 178 365 178 353
-             L178 206
-             C178 197 174 190 166 186Z"
+    <path d="M55 128 C47 123 38 129 38 139 L38 275 C38 289 45 300 57 307 L157 364 C168 370 178 365 178 353 L178 206 C178 197 174 190 166 186Z"
           fill="url(#leftGrad)"/>
 
-    <!-- right face -->
-    <path d="M334 128
-             C342 123 351 129 351 139
-             L351 275
-             C351 289 344 300 332 307
-             L232 364
-             C221 370 211 365 211 353
-             L211 206
-             C211 197 215 190 223 186Z"
+    <path d="M334 128 C342 123 351 129 351 139 L351 275 C351 289 344 300 332 307 L232 364 C221 370 211 365 211 353 L211 206 C211 197 215 190 223 186Z"
           fill="url(#rightGrad)"/>
 
-    <!-- white seams -->
     <path d="M178 205 L195 215 L211 205" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity=".96"/>
 
-    <!-- chart -->
     <g fill="#ffffff">
       <rect x="68" y="247" width="24" height="56" rx="6"/>
       <rect x="103" y="225" width="24" height="99" rx="6"/>
       <rect x="138" y="198" width="24" height="146" rx="6"/>
     </g>
 
-    <!-- check -->
     <path d="M253 269 L281 296 L326 231"
           fill="none" stroke="#ffffff" stroke-width="22"
           stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 
-  <!-- Wordmark -->
-  <g transform="translate(470 0)">
-    <text x="0" y="305"
-          font-family="Inter, Arial, Helvetica, sans-serif"
-          font-size="150" font-weight="800" letter-spacing="-7"
-          fill="#081a33">Smart</text>
-    <text x="418" y="305"
-          font-family="Inter, Arial, Helvetica, sans-serif"
-          font-size="150" font-weight="800" letter-spacing="-7"
-          fill="url(#stockGrad)">Stock</text>
-  </g>
+  <!-- Wordmark: single text element prevents Smart/Stock overlap -->
+  <text x="500" y="305"
+        font-family="Inter, Arial, Helvetica, sans-serif"
+        font-size="150" font-weight="800" letter-spacing="-5"
+        fill="#081a33">
+    <tspan>Smart</tspan><tspan fill="url(#stockGrad)">Stock</tspan>
+  </text>
 </svg>

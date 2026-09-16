@@ -206,115 +206,14 @@ const Home = () => {
           <div className="relative">
             <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-emerald-100 blur-3xl" />
 
-            <div className="relative rounded-3xl border border-gray-200 bg-white p-4 shadow-2xl shadow-gray-200/70">
-              
-              {/* Fake browser header */}
-              <div className="mb-4 flex items-center gap-2 border-b border-gray-100 pb-4">
-                <div className="h-3 w-3 rounded-full bg-gray-300" />
-                <div className="h-3 w-3 rounded-full bg-gray-300" />
-                <div className="h-3 w-3 rounded-full bg-gray-300" />
-
-                <div className="ml-3 h-7 flex-1 rounded-lg bg-gray-50" />
-              </div>
-
-              {/* Mini dashboard */}
-              <div className="rounded-2xl bg-[#f8fafb] p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-gray-500">Dashboard</p>
-                    <h3 className="mt-1 text-xl font-bold">
-                      Hi Aryan 👋
-                    </h3>
-                  </div>
-
-                  <div className="rounded-xl bg-emerald-500 px-4 py-2 text-xs font-semibold text-white">
-                    + Add Item
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  <div className="rounded-xl bg-white p-4 shadow-sm">
-                    <p className="text-xs text-gray-500">Total Items</p>
-                    <p className="mt-2 text-2xl font-bold">24</p>
-                  </div>
-
-                  <div className="rounded-xl bg-white p-4 shadow-sm">
-                    <p className="text-xs text-gray-500">Active</p>
-                    <p className="mt-2 text-2xl font-bold">14</p>
-                  </div>
-
-                  <div className="rounded-xl bg-white p-4 shadow-sm">
-                    <p className="text-xs text-gray-500">Expiring</p>
-                    <p className="mt-2 text-2xl font-bold text-orange-500">
-                      3
-                    </p>
-                  </div>
-
-                  <div className="rounded-xl bg-white p-4 shadow-sm">
-                    <p className="text-xs text-gray-500">Expired</p>
-                    <p className="mt-2 text-2xl font-bold text-red-500">
-                      2
-                    </p>
-                  </div>
-                </div>
-
-                {/* Expiring section */}
-                <div className="mt-4 rounded-xl bg-white p-4 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-bold">Expiring Soon</h4>
-
-                    <span className="text-xs font-semibold text-blue-600">
-                      View all →
-                    </span>
-                  </div>
-
-                  <div className="mt-3 space-y-2">
-                    {[
-                      ["Eggs", "3 days"],
-                      ["Bread", "5 days"],
-                      ["Milk", "6 days"],
-                    ].map(([name, days]) => (
-                      <div
-                        key={name}
-                        className="flex items-center justify-between rounded-lg bg-gray-50 p-3"
-                      >
-                        <span className="font-medium">{name}</span>
-
-                        <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-500">
-                          {days}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Inventory value */}
-                <div className="mt-4 flex items-center justify-between rounded-xl bg-emerald-50 p-4">
-                  <div>
-                    <p className="text-xs text-gray-500">
-                      Inventory Value
-                    </p>
-                    <p className="mt-1 text-xl font-bold">
-                      ₹12,450.75
-                    </p>
-                  </div>
-
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100">
-                    <BarChart3
-                      size={20}
-                      className="text-emerald-500"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+           
           </div>
+          
         </div>
       </section>
 
-      {/* ================= FEATURES ================= */}
-      <section
+   
+      {/* <section
         id="features"
         className="bg-white py-20 sm:py-24"
       >
@@ -362,12 +261,12 @@ const Home = () => {
             })}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ================= HOW IT WORKS ================= */}
       <section
         id="how-it-works"
-        className="bg-[#f8fafb] py-20 sm:py-24"
+        className="bg-[#f8fafb] py-10 sm:py-24"
       >
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
           <div className="text-center">

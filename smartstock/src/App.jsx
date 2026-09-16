@@ -1,23 +1,28 @@
-import React, { useEffect, useState } from "react";
-import DashboardLayout from "./Layouts/DashboardLayout";
-import Inventory from "./pages/Inventory";
-import Analytics from "./pages/Analytics";
-import Settings from "./pages/Settings";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
-import Login from "./components/auth/Login";
-import Signin from "./components/auth/Signin";
-import Item from "./components/Inventory/Item";
+
+import DashboardLayout from "./Layouts/DashboardLayout";
 import Loader from "./components/Loader";
-import Home from "./pages/Home";
-import Notifications from "./pages/Notifications";
-import AISuggestion from "./pages/AISuggestion";
-import History from "./pages/History";
 import Protected from "./routes/Protected";
+
+// Providers
 import { RecipeProvider } from "./context/recipeContext";
 import { NotificationProvider } from "./context/notificationContext";
 import { DashboardProvider } from "./context/dashboardContext";
 import { AnalyticsProvider } from "./context/analyticsContext";
+
+// Lazy-loaded pages
+const Home = lazy(() => import("./pages/Home"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Inventory = lazy(() => import("./pages/Inventory"));
+const History = lazy(() => import("./pages/History"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Notifications = lazy(() => import("./pages/Notifications"));
+const AISuggestion = lazy(() => import("./pages/AISuggestion"));
+const Item = lazy(() => import("./components/Inventory/Item"));
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -35,61 +40,109 @@ const App = () => {
   }
 
   return (
-    <div>
+    <Suspense fallback={<Loader text="Loading SmartStock..." />}>
       <Routes>
-        {/* Public */}
+        {/* ================= PUBLIC ROUTES ================= */}
+
         <Route path="/" element={<Home />} />
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Signin />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/login" element={<Auth />} />
+        <Route path="/register" element={<Auth />} />
 
-        {/* Protected dashboard routes */}
+        {/* ================= PROTECTED ROUTES ================= */}
+
         <Route element={<Protected />}>
           <Route element={<DashboardLayout />}>
-          <Route
-            path="/dashboard"
-            element={
-              <DashboardProvider>
-                <Dashboard />
-              </DashboardProvider>
-            }
-          />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/history" element={<History />} />
-          <Route
-            path="/analytics"
-            element={
-              <DashboardProvider>
-                <AnalyticsProvider>
-                  <Analytics />
-                </AnalyticsProvider>
-              </DashboardProvider>
-            }
-          />
-          <Route path="/settings" element={<Settings />} />
-          <Route
-            path="/notification"
-            element={
-              <NotificationProvider>
-                <Notifications />
-              </NotificationProvider>
-            }
-          />
-          <Route path="/inventory/:id" element={<Item />} />
-          <Route
-            path="/suggestion"
-            element={
-              <RecipeProvider>
-                <AISuggestion />
-              </RecipeProvider>
-            }
-          />
+            
+            {/* Dashboard */}
+            <Route
+              path="/dashboard"
+              element={
+                <DashboardProvider>
+                  <Dashboard />
+                </DashboardProvider>
+              }
+            />
+
+            {/* Inventory */}
+            <Route
+              path="/inventory"
+              element={<Inventory />}
+            />
+
+            {/* History */}
+            <Route
+              path="/history"
+              element={<History />}
+            />
+
+            {/* Analytics */}
+            <Route
+              path="/analytics"
+              element={
+                <DashboardProvider>
+                  <AnalyticsProvider>
+                    <Analytics />
+                  </AnalyticsProvider>
+                </DashboardProvider>
+              }
+            />
+
+            {/* Settings */}
+            <Route
+              path="/settings"
+              element={<Settings />}
+            />
+
+            {/* Profile */}
+            <Route
+              path="/profile"
+              element={
+                <DashboardProvider>
+                  <Profile />
+                </DashboardProvider>
+              }
+            />
+
+            {/* Notifications */}
+            <Route
+              path="/notification"
+              element={
+                <NotificationProvider>
+                  <Notifications />
+                </NotificationProvider>
+              }
+            />
+
+            {/* Single Inventory Item */}
+            <Route
+              path="/inventory/:id"
+              element={<Item />}
+            />
+
+            {/* AI Suggestions */}
+            <Route
+              path="/suggestion"
+              element={
+                <RecipeProvider>
+                  <AISuggestion />
+                </RecipeProvider>
+              }
+            />
+
           </Route>
         </Route>
-        {/* Default */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+        {/* ================= DEFAULT ================= */}
+
+        <Route
+          path="*"
+          element={<Navigate to="/dashboard" replace />}
+        />
       </Routes>
-    </div>
+    </Suspense>
   );
 };
+
 export default App;

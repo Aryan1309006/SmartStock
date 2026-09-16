@@ -1,11 +1,14 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import google from "../../assets/images/Google.png";
-import bgImg from "../../assets/images/loginBackground.png";
-import { useAuth } from "../../context/authContext";
+import { useLocation, useNavigate } from "react-router-dom";
+import google from "../assets/images/Google.png";
+import bgImg from "../assets/images/loginBackground.webp";
+import { useAuth } from "../context/authContext";
 
 const Login = () => {
-  const [tab, setTab] = React.useState("login");
+  const location = useLocation();
+  const [tab, setTab] = React.useState(
+    location.pathname === "/register" ? "signup" : "login",
+  );
   const [formData, setFormData] = React.useState({
     name: "",
     email: "",
@@ -15,6 +18,10 @@ const Login = () => {
   const [submitting, setSubmitting] = React.useState(false);
   const { login, register } = useAuth();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    setTab(location.pathname === "/register" ? "signup" : "login");
+  }, [location.pathname]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -51,13 +58,13 @@ const Login = () => {
   return (
     <div
       className="
-        relative flex min-h-screen w-full
-        items-center justify-center
-        overflow-hidden
-        bg-cover bg-center bg-no-repeat
-        px-4 py-6
-        sm:px-6
-        md:px-8
+    relative flex h-screen w-full
+    items-center justify-center
+    overflow-hidden
+    bg-cover bg-center bg-no-repeat
+    px-4 py-6
+    sm:px-6
+    md:px-8
       "
       style={{ backgroundImage: `url(${bgImg})` }}
     >

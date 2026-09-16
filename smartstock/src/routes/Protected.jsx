@@ -9,7 +9,7 @@ const Protected = () => {
     return null;
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+  return isAuthenticated ? <Outlet /> : <Navigate to="/Auth" replace />;
 };
 
 export default Protected;
