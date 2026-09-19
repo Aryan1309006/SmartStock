@@ -1,17 +1,29 @@
 const cors = require('cors');
 
-// Define allowed origins based on environment
-const allowedOrigins = {
+// Define default allowed origins based on environment
+const defaultOrigins = {
   development: ['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:3000'],
   production: ['https://smartstock-frontend.vercel.app'],
 };
 
-// Get origins based on NODE_ENV
+// Get origins based on NODE_ENV and environment variables
 const getOrigins = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return allowedOrigins.production;
+  const customOrigins = [];
+  if (process.env.CLIENT_URL) {
+    customOrigins.push(process.env.CLIENT_URL);
   }
-  return [...allowedOrigins.development, ...allowedOrigins.production];
+  if (process.env.ALLOWED_ORIGINS) {
+    customOrigins.push(...process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()));
+  }
+
+  if (customOrigins.length > 0) {
+    return Array.from(new Set([...customOrigins, ...defaultOrigins.development, ...defaultOrigins.production]));
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    return defaultOrigins.production;
+  }
+  return [...defaultOrigins.development, ...defaultOrigins.production];
 };
 
 // CORS options configuration
