@@ -6,4 +6,5 @@ backend/node_modules/
 smartstock/node_modules/
 smartstock/dist/
 smartstock/resolve.md
+fix.md
 .DS_Store
