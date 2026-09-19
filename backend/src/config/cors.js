@@ -3,7 +3,7 @@ const cors = require('cors');
 // Define default allowed origins based on environment
 const defaultOrigins = {
   development: ['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:3000'],
-  production: ['https://smartstock-frontend.vercel.app'],
+  production: ['https://smart-stock13.vercel.app/'],
 };
 
 // Get origins based on NODE_ENV and environment variables
