@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./authContext";
+
 import {
   createItem,
   getAllItems,
@@ -12,15 +13,17 @@ import {
 
 const ItemContext = createContext(null);
 
-// Provide item state and CRUD actions to the component tree.
 export const ItemProvider = ({ children }) => {
   const { user, loading: authLoading } = useAuth();
+
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [error, setError] = useState(null);
 
-  // Load the current user's items and expose request errors to the UI.
+  // =========================
+  // GET ALL ITEMS
+  // =========================
   const fetchItems = async () => {
     try {
       setLoading(true);
@@ -30,11 +33,17 @@ export const ItemProvider = ({ children }) => {
 
       setItems(data.data?.items ?? data.items ?? []);
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to fetch items");
+      setError(
+        error.response?.data?.message || "Failed to fetch items"
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  // =========================
+  // GET SINGLE ITEM
+  // =========================
   const fetchSingleItem = async (id) => {
     try {
       setLoading(true);
@@ -43,94 +52,209 @@ export const ItemProvider = ({ children }) => {
       const data = await getItemById(id);
 
       const item = data.data?.item ?? data.item ?? null;
+
       setSelectedItem(item);
+
       return item;
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to fetch items");
+      // Important:
+      // Clear old selected item if the requested item doesn't exist
+      setSelectedItem(null);
+
+      setError(
+        error.response?.data?.message || "Failed to fetch item"
+      );
+
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  // Add an item and append the server-created record to local state.
+  // =========================
+  // ADD ITEM
+  // =========================
   const addItem = async (itemData) => {
     try {
       setError(null);
 
       const data = await createItem(itemData);
 
-      setItems((prevItems) => [...prevItems, data.data?.item ?? data.item]);
+      const newItem = data.data?.item ?? data.item;
 
-      return data.data?.item ?? data.item;
+      if (newItem) {
+        setItems((prevItems) => [...prevItems, newItem]);
+      }
+
+      return newItem;
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to create item");
+      setError(
+        error.response?.data?.message || "Failed to add item"
+      );
 
       throw error;
     }
   };
 
-  // Update an item and replace its local copy with the server response.
+  // =========================
+  // EDIT ITEM
+  // =========================
   const editItem = async (id, itemData) => {
     try {
       setError(null);
 
       const data = await updateItem(id, itemData);
 
+      const updatedItem =
+        data.data?.item ?? data.item ?? data.data ?? data;
+
       setItems((prevItems) =>
         prevItems.map((item) =>
-          item._id === id ? (data.data?.item ?? data.item) : item,
-        ),
+          String(item._id) === String(id)
+            ? updatedItem
+            : item
+        )
       );
 
-      return data.data?.item ?? data.item;
+      // Also update selected item if currently viewing it
+      setSelectedItem((prevItem) =>
+        prevItem && String(prevItem._id) === String(id)
+          ? updatedItem
+          : prevItem
+      );
+
+      return updatedItem;
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to update item");
+      setError(
+        error.response?.data?.message || "Failed to update item"
+      );
 
       throw error;
     }
   };
 
-  // Change an item's state to consumed in the API and local state.
+  // =========================
+  // CONSUME ITEM
+  // =========================
   const consumeItem = async (id) => {
-    const data = await markItemConsumed(id);
-    const updatedItem = data.data?.item ?? data.item;
-    setItems((prevItems) =>
-      prevItems.map((item) => (item._id === id ? updatedItem : item)),
-    );
-    return updatedItem;
+    try {
+      setError(null);
+
+      const data = await markItemConsumed(id);
+
+      const updatedItem =
+        data.data?.item ?? data.item ?? data.data ?? data;
+
+      setItems((prevItems) =>
+        prevItems.map((item) =>
+          String(item._id) === String(id)
+            ? updatedItem
+            : item
+        )
+      );
+
+      setSelectedItem((prevItem) =>
+        prevItem && String(prevItem._id) === String(id)
+          ? updatedItem
+          : prevItem
+      );
+
+      return updatedItem;
+    } catch (error) {
+      setError(
+        error.response?.data?.message || "Failed to consume item"
+      );
+
+      throw error;
+    }
   };
 
-  // Restore a consumed item in the API and local state.
+  // =========================
+  // RESTORE CONSUMED ITEM
+  // =========================
   const restoreConsumedItem = async (id) => {
-    const data = await restoreItem(id);
-    const updatedItem = data.data?.item ?? data.item;
-    setItems((prevItems) =>
-      prevItems.map((item) => (item._id === id ? updatedItem : item)),
-    );
-    return updatedItem;
+    try {
+      setError(null);
+
+      const data = await restoreItem(id);
+
+      const updatedItem =
+        data.data?.item ?? data.item ?? data.data ?? data;
+
+      setItems((prevItems) =>
+        prevItems.map((item) =>
+          String(item._id) === String(id)
+            ? updatedItem
+            : item
+        )
+      );
+
+      setSelectedItem((prevItem) =>
+        prevItem && String(prevItem._id) === String(id)
+          ? updatedItem
+          : prevItem
+      );
+
+      return updatedItem;
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+          "Failed to restore item"
+      );
+
+      throw error;
+    }
   };
 
-  // Delete an item and remove its local copy after success.
+  // =========================
+  // DELETE ITEM
+  // =========================
   const removeItem = async (id) => {
     try {
       setError(null);
 
+      // Delete from backend first
       await deleteItem(id);
 
-      setItems((prevItems) => prevItems.filter((item) => item._id !== id));
+      // Remove from items list
+      setItems((prevItems) =>
+        prevItems.filter(
+          (item) => String(item._id) !== String(id)
+        )
+      );
+
+      // IMPORTANT:
+      // Clear selectedItem if it is the deleted item
+      setSelectedItem((prevItem) => {
+        if (
+          prevItem &&
+          String(prevItem._id) === String(id)
+        ) {
+          return null;
+        }
+
+        return prevItem;
+      });
+
+      return true;
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to delete item");
+      setError(
+        error.response?.data?.message || "Failed to delete item"
+      );
 
       throw error;
     }
   };
 
-  // Fetch items once when the provider is mounted.
+  // =========================
+  // FETCH ITEMS WHEN USER LOADS
+  // =========================
   useEffect(() => {
     if (authLoading) return;
 
     if (!user) {
       setItems([]);
+      setSelectedItem(null);
       setLoading(false);
       return;
     }
@@ -138,6 +262,9 @@ export const ItemProvider = ({ children }) => {
     fetchItems();
   }, [authLoading, user]);
 
+  // =========================
+  // CONTEXT VALUE
+  // =========================
   const value = {
     items,
     selectedItem,
@@ -146,21 +273,30 @@ export const ItemProvider = ({ children }) => {
 
     fetchItems,
     fetchSingleItem,
+
     addItem,
     editItem,
+
     removeItem,
+
     consumeItem,
     restoreConsumedItem,
   };
 
-  return <ItemContext.Provider value={value}>{children}</ItemContext.Provider>;
+  return (
+    <ItemContext.Provider value={value}>
+      {children}
+    </ItemContext.Provider>
+  );
 };
 
 export const useItems = () => {
   const context = useContext(ItemContext);
 
   if (!context) {
-    throw new Error("useItems must be used inside ItemProvider");
+    throw new Error(
+      "useItems must be used inside ItemProvider"
+    );
   }
 
   return context;

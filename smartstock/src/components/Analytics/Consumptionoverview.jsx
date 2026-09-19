@@ -10,34 +10,41 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const Consumptionoverview = ({ items = [], dashboard = {} }) => {
-  const chartData = items
-    .reduce((acc, item) => {
-      const addedDate = item.purchaseDate;
-      const consumedDate =
-        item.status === "consumed" && item.consumedAt
-          ? item.consumedAt.split("T")[0]
-          : null;
+const Consumptionoverview = ({
+  items = [],
+  dashboard = {},
+  chartData: apiChartData,
+}) => {
+  const chartData =
+    apiChartData && apiChartData.length > 0
+      ? apiChartData
+      : items
+          .reduce((acc, item) => {
+            const addedDate = item.purchaseDate;
+            const consumedDate =
+              item.status === "consumed" && item.consumedAt
+                ? item.consumedAt.split("T")[0]
+                : null;
 
-      const existingAdded = acc.find((entry) => entry.date === addedDate);
-      if (existingAdded) {
-        existingAdded.added += item.quantity;
-      } else {
-        acc.push({ date: addedDate, added: item.quantity, consumed: 0 });
-      }
+            const existingAdded = acc.find((entry) => entry.date === addedDate);
+            if (existingAdded) {
+              existingAdded.added += item.quantity;
+            } else {
+              acc.push({ date: addedDate, added: item.quantity, consumed: 0 });
+            }
 
-      if (consumedDate) {
-        const existingConsumed = acc.find((entry) => entry.date === consumedDate);
-        if (existingConsumed) {
-          existingConsumed.consumed += item.quantity;
-        } else {
-          acc.push({ date: consumedDate, added: 0, consumed: item.quantity });
-        }
-      }
+            if (consumedDate) {
+              const existingConsumed = acc.find((entry) => entry.date === consumedDate);
+              if (existingConsumed) {
+                existingConsumed.consumed += item.quantity;
+              } else {
+                acc.push({ date: consumedDate, added: 0, consumed: item.quantity });
+              }
+            }
 
-      return acc;
-    }, [])
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
+            return acc;
+          }, [])
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
 
   return (
     <div className="w-full rounded-2xl bg-white p-4 shadow-sm sm:p-6">

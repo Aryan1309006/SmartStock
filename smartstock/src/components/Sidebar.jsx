@@ -1,12 +1,12 @@
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/authContext";
 import logo from "../assets/SmartStockLogo.svg";
 import boxLogo from "../assets/smartstock-box-logo.svg";
 import {
   LayoutDashboard,
   Package,
   History,
-  Plus,
   User,
   Settings,
   LogOut,
@@ -47,6 +47,19 @@ export const navOption = [
   },
 ];
 const Sidebar = ({ open, setOpen }) => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    setOpen(false);
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      navigate("/");
+    }
+  };
   return (
     <>
     {open && (
@@ -116,14 +129,14 @@ const Sidebar = ({ open, setOpen }) => {
 
 
         <div>
-          <Link
-            to="/logout"
-            onClick={() => setOpen(false)}
-            className="flex items-center justify-center gap-3 rounded-xl p-2 font-semibold text-gray-500 hover:bg-red-100 hover:text-red-400 lg:justify-center lg:group-hover:justify-start"
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl p-2 font-semibold text-gray-500 hover:bg-red-100 hover:text-red-400 lg:justify-center lg:group-hover:justify-start"
           >
             <LogOut size={20} />
             <span className="lg:invisible lg:w-0 lg:opacity-0 lg:transition-opacity lg:group-hover:visible lg:group-hover:w-auto lg:group-hover:opacity-100">Log out</span>
-          </Link>
+          </button>
         </div>
 
 

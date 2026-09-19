@@ -2,6 +2,7 @@ import React from "react";
 import Dashborardcard from "../components/dashboard/Dashborardcard";
 import Statcard from "../components/dashboard/Statcard";
 import { lazy, Suspense } from "react";
+import Loader from "../components/Loader";
 const CategoryChart = lazy(() => import("../components/dashboard/CategoryChart"),);
 import { useAuth } from "../context/authContext";
 import { useDashboard } from "../context/dashboardContext";
@@ -15,7 +16,7 @@ const Dashboard = () => {
   const { items, loading: itemsLoading, error: itemsError } = useItems();
 
   if (loading || itemsLoading) {
-    return <div className="p-6 text-gray-500">Loading dashboard...</div>;
+    return <div className="p-6 text-gray-500"><Loader/></div>;
   }
 
   if (error || itemsError) {

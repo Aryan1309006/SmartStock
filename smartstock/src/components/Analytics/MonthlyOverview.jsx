@@ -12,14 +12,14 @@ import {
 
 import { Plus, Utensils, AlertTriangle, Wallet } from "lucide-react";
 
-const MonthlyOverview = ({ items = [] }) => {
+const MonthlyOverview = ({ items = [], monthly }) => {
+  const summary = monthly?.summary;
 
   // CURRENT MONTH
   const now = new Date();
 
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
-
 
   // MONTHLY ITEMS
   const monthlyItems = items.filter((item) => {
@@ -30,37 +30,35 @@ const MonthlyOverview = ({ items = [] }) => {
     );
   });
 
-
   // ADDED
-  const added = monthlyItems.reduce((total, item) => total + item.quantity, 0);
-
+  const added =
+    summary?.added ??
+    monthlyItems.reduce((total, item) => total + item.quantity, 0);
 
   // CONSUMED
+  const consumed =
+    summary?.consumed ??
+    items
+      .filter((item) => {
+        if (!item.consumedAt) return false;
 
-  const consumed = items
-    .filter((item) => {
-      if (!item.consumedAt) return false;
+        const date = new Date(item.consumedAt);
 
-      const date = new Date(item.consumedAt);
-
-      return (
-        date.getFullYear() === currentYear && date.getMonth() === currentMonth
-      );
-    })
-    .reduce((total, item) => total + item.quantity, 0);
+        return (
+          date.getFullYear() === currentYear && date.getMonth() === currentMonth
+        );
+      })
+      .reduce((total, item) => total + item.quantity, 0);
 
   // EXPIRED
-
-  const expired = monthlyItems.filter(
-    (item) => item.status === "expired",
-  ).length;
-
+  const expired =
+    summary?.expired ??
+    monthlyItems.filter((item) => item.status === "expired").length;
 
   // INVENTORY VALUE
-  const value = monthlyItems.reduce(
-    (total, item) => total + item.quantity * item.price,
-    0,
-  );
+  const value =
+    summary?.value ??
+    monthlyItems.reduce((total, item) => total + item.quantity * item.price, 0);
 
   // CHART DATA
   const createMonthlyData = () => {
@@ -107,7 +105,16 @@ const MonthlyOverview = ({ items = [] }) => {
       }));
   };
 
-  const chartData = createMonthlyData();
+  const chartData =
+    monthly?.chartData && monthly.chartData.length > 0
+      ? monthly.chartData.map((item) => ({
+          ...item,
+          month: new Date(`${item.month}-01`).toLocaleDateString("en-IN", {
+            month: "short",
+            year: "numeric",
+          }),
+        }))
+      : createMonthlyData();
   // CARD DATA
 
 

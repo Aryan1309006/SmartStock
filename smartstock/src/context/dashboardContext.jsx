@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useItems } from "./itemContext";
 
 import {
   dashboardData,
@@ -10,6 +11,7 @@ import {
 const DashboardContext = createContext(null);
 
 export const DashboardProvider = ({ children }) => {
+  const { items } = useItems();
   const [loading, setLoading] = useState(true);
 
   const [dashboard, setDashboard] = useState(null);
@@ -19,9 +21,11 @@ export const DashboardProvider = ({ children }) => {
 
   const [error, setError] = useState(null);
 
-  const fetchAllDashboardData = async () => {
+  const fetchAllDashboardData = async (showLoading = false) => {
     try {
-      setLoading(true);
+      if (showLoading || !dashboard) {
+        setLoading(true);
+      }
       setError(null);
 
       const [
@@ -62,7 +66,7 @@ export const DashboardProvider = ({ children }) => {
 
   useEffect(() => {
     fetchAllDashboardData();
-  }, []);
+  }, [items]);
 
   const value = {
     loading,

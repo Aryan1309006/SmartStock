@@ -47,22 +47,24 @@ const App = () => {
         <Route path="/" element={<Home />} />
 
         <Route path="/auth" element={<Auth />} />
-        <Route path="/login" element={<Auth />} />
+        {/* <Route path="/login" element={<Auth />} /> */}
         <Route path="/register" element={<Auth />} />
 
         {/* ================= PROTECTED ROUTES ================= */}
 
         <Route element={<Protected />}>
-          <Route element={<DashboardLayout />}>
+          <Route
+            element={
+              <DashboardProvider>
+                <DashboardLayout />
+              </DashboardProvider>
+            }
+          >
             
             {/* Dashboard */}
             <Route
               path="/dashboard"
-              element={
-                <DashboardProvider>
-                  <Dashboard />
-                </DashboardProvider>
-              }
+              element={<Dashboard />}
             />
 
             {/* Inventory */}
@@ -81,11 +83,9 @@ const App = () => {
             <Route
               path="/analytics"
               element={
-                <DashboardProvider>
-                  <AnalyticsProvider>
-                    <Analytics />
-                  </AnalyticsProvider>
-                </DashboardProvider>
+                <AnalyticsProvider>
+                  <Analytics />
+                </AnalyticsProvider>
               }
             />
 
@@ -98,11 +98,7 @@ const App = () => {
             {/* Profile */}
             <Route
               path="/profile"
-              element={
-                <DashboardProvider>
-                  <Profile />
-                </DashboardProvider>
-              }
+              element={<Profile />}
             />
 
             {/* Notifications */}

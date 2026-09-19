@@ -51,7 +51,7 @@ const Item = () => {
     if (!item && id) {
       fetchSingleItem(id);
     }
-  }, [id]);
+  }, [id, item, fetchSingleItem]);
 
   useEffect(() => {
     if (item) {
@@ -201,27 +201,29 @@ const Item = () => {
     setEditing(true);
   };
 
-  const handleDelete = async () => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${item.name}"?`,
+const handleDelete = async () => {
+  const confirmed = window.confirm(
+    `Are you sure you want to delete "${item.name}"?`,
+  );
+
+  if (!confirmed) return;
+
+  try {
+    setActionLoading(true);
+    setActionError("");
+
+    await removeItem(item._id);
+
+    // Navigate only after successful deletion
+    navigate("/inventory", { replace: true });
+  } catch (requestError) {
+    setActionError(
+      requestError.response?.data?.message || "Failed to delete item",
     );
-
-    if (!confirmed) return;
-
-    try {
-      setActionLoading(true);
-      setActionError("");
-      await removeItem(item._id);
-      navigate("/inventory");
-    } catch (requestError) {
-      setActionError(
-        requestError.response?.data?.message || "Failed to delete item",
-      );
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
+  } finally {
+    setActionLoading(false);
+  }
+};
   const handleConsumed = async () => {
     try {
       setActionLoading(true);

@@ -32,7 +32,9 @@ const CategoryChart = ({ items = [], dashboard = {} }) => {
     };
   }, []);
 
-  const categoryCount = items.reduce((acc, item) => {
+  const activeItems = items.filter((item) => item.status !== "consumed");
+
+  const categoryCount = activeItems.reduce((acc, item) => {
     acc[item.category] = (acc[item.category] || 0) + 1;
     return acc;
   }, {});
@@ -129,7 +131,7 @@ const CategoryChart = ({ items = [], dashboard = {} }) => {
                 fontSize: "12px",
               }}
               formatter={(value) => {
-                const total = items.length;
+                const total = activeItems.length;
                 const count = categoryCount[value];
 
                 const percentage = total

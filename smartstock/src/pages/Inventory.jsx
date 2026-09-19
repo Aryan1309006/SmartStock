@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import { categories, statuses } from "../assets/dummydata/constants";
 import Inventoryitem from "../components/Inventory/Inventoryitem";
 import { useItems } from "../context/itemContext";
+import Loader from "../components/Loader";
 
 const Inventory = () => {
   const [category, setCategory] = useState("");
@@ -12,6 +13,7 @@ const Inventory = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const { items: allItems, loading, error } = useItems();
+
   const items = allItems.filter((item) => item.status !== "consumed");
 
   const filteredItems = useMemo(() => {
@@ -68,14 +70,64 @@ const Inventory = () => {
 
   const hasFilters = searchTerm || category || status || sort;
 
-  if (loading) {
-    return <p className="p-6 text-gray-500">Loading inventory...</p>;
+  // Show loader while inventory/items are loading
+  if (loading && !items) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-5">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-emerald-500" />
+
+        <p className="mt-4 text-sm font-medium text-gray-500">
+          Loading item...
+        </p>
+      </div>
+    );
   }
 
-  if (error) {
-    return <p className="p-6 text-red-600">{error}</p>;
+  // Only show error after loading has finished
+  if (error && !items && !loading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-5">
+        <Package size={50} className="mb-4 text-red-300" />
+
+        <h2 className="text-2xl font-bold text-gray-800">
+          Unable to load item
+        </h2>
+
+        <p className="mt-2 text-gray-500 text-center">{error}</p>
+
+        <button
+          onClick={() => navigate("/inventory")}
+          className="mt-6 flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-white transition hover:bg-emerald-700"
+        >
+          <ArrowLeft size={18} />
+          Back to Inventory
+        </button>
+      </div>
+    );
   }
 
+  // Only show "not found" when loading has completely finished
+  if (!items && !loading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-5">
+        <Package size={50} className="mb-4 text-gray-300" />
+
+        <h2 className="text-2xl font-bold text-gray-800">Item not found</h2>
+
+        <p className="mt-2 text-gray-500">
+          The item you're looking for doesn't exist.
+        </p>
+
+        <button
+          onClick={() => navigate("/inventory")}
+          className="mt-6 flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-white transition hover:bg-emerald-700"
+        >
+          <ArrowLeft size={18} />
+          Back to Inventory
+        </button>
+      </div>
+    );
+  }
   return (
     <div
       className="
