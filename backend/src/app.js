@@ -12,6 +12,7 @@ app.use(cookieparser());
 const allowedOrigins = [
   "http://localhost:5173",
   "https://smart-stock13.vercel.app",
+  "https://smart-stock-68m4xleo-aryanpatil13092006-6572s-projects.vercel.app",
 ];
 
 app.use(
@@ -29,7 +30,7 @@ app.use(
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
-  })
+  }),
 );
 
 app.use("/api/auth", require("./routes/auth.route"));
