@@ -29,7 +29,8 @@ export const AuthProvider = ({ children }) => {
   // Authenticate and keep the returned user in context.
   const login = async (credentials) => {
     const data = await loginUser(credentials.email, credentials.password);
-
+    const token = data.data?.token ?? data.token;
+    if (token) localStorage.setItem("token", token);
     setUser(data.data?.user ?? data.user);
 
     return data;
@@ -42,7 +43,8 @@ export const AuthProvider = ({ children }) => {
       userData.email,
       userData.password,
     );
-
+    const token = data.data?.token ?? data.token;
+    if (token) localStorage.setItem("token", token);
     setUser(data.data?.user ?? data.user);
 
     return data;
@@ -53,6 +55,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await logoutUser();
     } finally {
+       localStorage.removeItem("token"); 
       setUser(null);
     }
   };
