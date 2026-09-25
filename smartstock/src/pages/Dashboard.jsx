@@ -7,6 +7,7 @@ const CategoryChart = lazy(() => import("../components/dashboard/CategoryChart")
 import { useAuth } from "../context/authContext";
 import { useDashboard } from "../context/dashboardContext";
 import { useItems } from "../context/itemContext";
+import { CircleAlert } from "lucide-react";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -20,7 +21,7 @@ const Dashboard = () => {
   }
 
   if (error || itemsError) {
-    return <div className="p-6 text-red-600">{error || itemsError}</div>;
+    return <div className="flex flex-col items-center justify-center font-bold text-red-600"><CircleAlert/> {error || itemsError}</div>;
   }
 
   return (

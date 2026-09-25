@@ -72,15 +72,7 @@ const Inventory = () => {
 
   // Show loader while inventory/items are loading
   if (loading && !items) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center px-5">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-emerald-500" />
-
-        <p className="mt-4 text-sm font-medium text-gray-500">
-          Loading item...
-        </p>
-      </div>
-    );
+   return <Loader text="Loading inventory..." />;
   }
 
   // Only show error after loading has finished
