@@ -33,10 +33,21 @@ const suggestRecipes = async (req, res) => {
       .sort({ expiryDate: 1 })
       .lean();
 
-    // Remove avoided ingredients
-    const availableItems = items.filter(
-      (item) => !avoidItems.includes(String(item.name).toLowerCase()),
-    );
+    // Remove avoided ingredients and expired items
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const availableItems = items.filter((item) => {
+      // Exclude avoided items
+      if (avoidItems.includes(String(item.name).toLowerCase())) return false;
+      // Exclude manually marked expired items
+      if (item.status === "expired") return false;
+
+      // Exclude items past their expiry date
+      const expiry = new Date(item.expiryDate);
+      expiry.setHours(0, 0, 0, 0);
+      return expiry >= today;
+    });
 
     if (availableItems.length === 0) {
       return res.status(200).json({

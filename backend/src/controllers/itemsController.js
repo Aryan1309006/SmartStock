@@ -185,22 +185,36 @@ const deleteOne = async (req, res) => {
 };
 const markConsume = async (req, res) => {
   try {
-    const item = await Item.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.userId },
-      { status: "consumed", consumedAt: new Date() },
-      { new: true, runValidators: true },
-    );
+    const { amount } = req.body;
+    let item = await Item.findOne({ _id: req.params.id, userId: req.user.userId });
+    
     if (!item) {
       return res.status(404).json({
         success: false,
         message: "Item not found",
       });
     }
+
+    if (amount !== undefined) {
+      const consumeAmount = Number(amount);
+      if (consumeAmount > 0 && consumeAmount < item.quantity) {
+        item.quantity -= consumeAmount;
+        await item.save();
+        return res.status(200).json({
+          success: true,
+          data: { item },
+        });
+      }
+    }
+
+    // Fully consumed
+    item.status = "consumed";
+    item.consumedAt = new Date();
+    await item.save();
+
     res.status(200).json({
       success: true,
-      data: {
-        item,
-      },
+      data: { item },
     });
   } catch (error) {
     console.error("Mark Consume Item Error:", error);

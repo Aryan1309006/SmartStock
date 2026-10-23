@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, X, Package, ArrowLeft } from "lucide-react";
 
 import { categories, statuses } from "../assets/dummydata/constants";
 import Inventoryitem from "../components/Inventory/Inventoryitem";
@@ -14,7 +14,14 @@ const Inventory = () => {
 
   const { items: allItems, loading, error } = useItems();
 
-  const items = allItems.filter((item) => item.status !== "consumed");
+  const items = allItems.filter((item) => {
+    if (item.status === "consumed" || item.status === "expired") return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const expiry = new Date(item.expiryDate);
+    expiry.setHours(0, 0, 0, 0);
+    return expiry >= today;
+  });
 
   const filteredItems = useMemo(() => {
     let filtered = [...items];

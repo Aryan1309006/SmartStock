@@ -19,24 +19,29 @@ const dashboard = async (req, res) => {
     const today = startOfToday();
     const items = await Item.find({ userId }).lean();
 
-    const activeItems = items.filter((item) => item.status !== "consumed");
-    const daysRemaining = activeItems.map((item) => ({
-      item,
-      days: getDaysRemaining(item.expiryDate, today),
-    }));
+    const activeItems = [];
+    let expiredCount = 0;
+    let consumedCount = 0;
 
-    const totalItems = items.length;
-    const freshItems = daysRemaining.filter(({ days }) => days > 7).length;
-    const consumedItems = items.filter(
-      (item) => item.status === "consumed" || item.consumedAt,
-    ).length;
-    const expiringItems = daysRemaining.filter(
+    items.forEach((item) => {
+      const days = getDaysRemaining(item.expiryDate, today);
+      if (item.status === "consumed" || item.consumedAt) {
+        consumedCount++;
+      } else if (item.status === "expired" || days < 0) {
+        expiredCount++;
+      } else {
+        activeItems.push({ item, days });
+      }
+    });
+
+    const totalItems = activeItems.length;
+    const freshItems = activeItems.filter(({ days }) => days > 7).length;
+    const expiringItems = activeItems.filter(
       ({ days }) => days >= 0 && days <= 7,
     ).length;
-    const expiredItems = daysRemaining.filter(({ days }) => days < 0).length;
 
-    const inventoryValue = items.reduce(
-      (total, item) => total + item.price * item.quantity,
+    const inventoryValue = activeItems.reduce(
+      (total, { item }) => total + item.price * item.quantity,
       0,
     );
 
@@ -45,9 +50,9 @@ const dashboard = async (req, res) => {
       data: {
         totalItems,
         freshItems,
-        consumedItems,
+        consumedItems: consumedCount,
         expiringItems,
-        expiredItems,
+        expiredItems: expiredCount,
         inventoryValue,
       },
     });
@@ -90,16 +95,22 @@ const expiringSoon = async (req, res) => {
 
 const recentlyConsumed = async (req, res) => {
   try {
-    const items = await Item.find({
-      userId: req.user.userId,
-      consumedAt: { $ne: null },
-    })
-      .sort({ consumedAt: -1 })
-      .lean();
+    const today = startOfToday();
+    const allItems = await Item.find({ userId: req.user.userId }).lean();
+
+    const historyItems = allItems.filter((item) => {
+      if (item.status === "consumed" || item.consumedAt) return true;
+      if (item.status === "expired") return true;
+      return getDaysRemaining(item.expiryDate, today) < 0;
+    }).sort((a, b) => {
+      const dateA = new Date(a.consumedAt || a.expiryDate || 0);
+      const dateB = new Date(b.consumedAt || b.expiryDate || 0);
+      return dateB - dateA;
+    });
 
     res.status(200).json({
       success: true,
-      data: { recentlyConsumed: items },
+      data: { recentlyConsumed: historyItems },
     });
   } catch (error) {
     res.status(500).json({

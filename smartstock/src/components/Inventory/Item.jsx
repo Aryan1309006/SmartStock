@@ -33,6 +33,8 @@ const Item = () => {
   const [editing, setEditing] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState("");
+  const [showConsumeModal, setShowConsumeModal] = useState(false);
+  const [consumeAmount, setConsumeAmount] = useState("");
   const [editForm, setEditForm] = useState({
     name: "",
     category: "",
@@ -224,11 +226,23 @@ const handleDelete = async () => {
     setActionLoading(false);
   }
 };
-  const handleConsumed = async () => {
+  const handleConsumed = () => {
+    setConsumeAmount(item.quantity);
+    setShowConsumeModal(true);
+  };
+
+  const submitConsume = async (e) => {
+    e.preventDefault();
+    const amount = Number(consumeAmount);
+    if (isNaN(amount) || amount <= 0 || amount > item.quantity) {
+      alert(`Please enter a valid amount between 1 and ${item.quantity}`);
+      return;
+    }
     try {
       setActionLoading(true);
       setActionError("");
-      await consumeItem(item._id);
+      await consumeItem(item._id, amount === item.quantity ? undefined : amount);
+      setShowConsumeModal(false);
     } catch (requestError) {
       setActionError(
         requestError.response?.data?.message || "Failed to mark item as consumed",
@@ -568,6 +582,50 @@ const handleDelete = async () => {
                 className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
               >
                 {actionLoading ? "Saving..." : "Save Changes"}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {showConsumeModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <form
+              onSubmit={submitConsume}
+              className="w-full max-w-sm space-y-4 rounded-2xl bg-white p-6 shadow-2xl"
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">Consume Item</h2>
+                <button
+                  type="button"
+                  onClick={() => setShowConsumeModal(false)}
+                  className="text-gray-500 hover:text-gray-900"
+                >
+                  Close
+                </button>
+              </div>
+
+              <p className="text-sm text-gray-600">
+                How much of <strong>{item.name}</strong> are you consuming?
+                (Total available: {item.quantity})
+              </p>
+
+              <input
+                type="number"
+                min="1"
+                max={item.quantity}
+                value={consumeAmount}
+                onChange={(e) => setConsumeAmount(e.target.value)}
+                required
+                placeholder="Amount to consume"
+                className="w-full rounded-xl border border-gray-300 px-3 py-2"
+              />
+
+              <button
+                type="submit"
+                disabled={actionLoading}
+                className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+              >
+                {actionLoading ? "Saving..." : "Confirm"}
               </button>
             </form>
           </div>

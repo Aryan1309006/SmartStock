@@ -16,12 +16,18 @@ const Login = () => {
   });
   const [error, setError] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
-  const { login, register } = useAuth();
+  const { login, register, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
 
   React.useEffect(() => {
     setTab(location.pathname === "/register" ? "signup" : "login");
   }, [location.pathname]);
+
+  React.useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [loading, isAuthenticated, navigate]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;

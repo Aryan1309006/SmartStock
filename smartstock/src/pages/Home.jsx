@@ -10,12 +10,21 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import HeroImg from "../assets/HeroImage.png";
+import { useAuth } from "../context/authContext";
 
 const Home = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [loading, isAuthenticated, navigate]);
 
   const features = [
     {

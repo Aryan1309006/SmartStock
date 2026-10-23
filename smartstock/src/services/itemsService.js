@@ -31,8 +31,8 @@ export const deleteItem = async (id) => {
 };
 
 // Mark an item as consumed.
-export const markItemConsumed = async (id) => {
-  const response = await api.patch(`/items/${id}/consume`);
+export const markItemConsumed = async (id, amount) => {
+  const response = await api.patch(`/items/${id}/consume`, { amount });
   return response.data;
 };
 

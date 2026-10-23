@@ -14,3 +14,20 @@ export const categoryImages = {
   Toiletries: toiletriesImage,
   Cleaning: cleaningImage
 };
+
+
+// const categories = [
+//   "Fruits & Vegetables",
+//   "Dairy",
+//   "Grains & Rice",
+//   "Pantry",
+//   "Beverages",
+//   "Bakery",
+//   "Meat & Seafood",
+//   "Frozen Food",
+//   "Snacks",
+//   "Spices & Condiments",
+//   "Household",
+//   "Personal Care",
+//   "Other"
+// ];

@@ -136,11 +136,11 @@ export const ItemProvider = ({ children }) => {
   // =========================
   // CONSUME ITEM
   // =========================
-  const consumeItem = async (id) => {
+  const consumeItem = async (id, amount) => {
     try {
       setError(null);
 
-      const data = await markItemConsumed(id);
+      const data = await markItemConsumed(id, amount);
 
       const updatedItem =
         data.data?.item ?? data.item ?? data.data ?? data;

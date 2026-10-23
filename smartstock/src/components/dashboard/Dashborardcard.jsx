@@ -53,9 +53,9 @@ const Dashborardcard = ({ item = [], name, type }) => {
               {/* Recently Consumed Card */}
               {type === "consumed" && (
                 <p className="mt-1 text-sm text-gray-500">
-                  Consumed:{" "}
+                  {product.status === "consumed" || product.consumedAt ? "Consumed" : "Expired"}:{" "}
                   {new Date(
-                    product.consumedAt
+                    (product.status === "consumed" || product.consumedAt) ? product.consumedAt : product.expiryDate
                   ).toLocaleDateString()}
                 </p>
               )}
