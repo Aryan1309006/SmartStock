@@ -1,62 +1,46 @@
-// const cors = require('cors');
+const defaultOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:3000",
+  "https://smart-stock13.vercel.app",
+  "https://smart-stock-68m4xleo-aryanpatil13092006-6572s-projects.vercel.app",
+];
 
-// // Define default allowed origins based on environment
-// const defaultOrigins = {
-//   development: ['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:3000'],
-//   production: ['https://smart-stock13.vercel.app/'],
-// };
+const getAllowedOrigins = () => {
+  const origins = new Set(defaultOrigins);
 
-// // Get origins based on NODE_ENV and environment variables
-// const getOrigins = () => {
-//   const customOrigins = [];
-//   if (process.env.CLIENT_URL) {
-//     customOrigins.push(process.env.CLIENT_URL);
-//   }
-//   if (process.env.ALLOWED_ORIGINS) {
-//     customOrigins.push(...process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()));
-//   }
+  if (process.env.CLIENT_URL) {
+    origins.add(process.env.CLIENT_URL.replace(/\/$/, ""));
+  }
 
-//   if (customOrigins.length > 0) {
-//     return Array.from(new Set([...customOrigins, ...defaultOrigins.development, ...defaultOrigins.production]));
-//   }
+  if (process.env.ALLOWED_ORIGINS) {
+    process.env.ALLOWED_ORIGINS.split(",")
+      .map((o) => o.trim().replace(/\/$/, ""))
+      .filter(Boolean)
+      .forEach((o) => origins.add(o));
+  }
 
-//   if (process.env.NODE_ENV === 'production') {
-//     return defaultOrigins.production;
-//   }
-//   return [...defaultOrigins.development, ...defaultOrigins.production];
-// };
+  return Array.from(origins);
+};
 
-// // CORS options configuration
-// const corsOptions = {
-//   // Dynamic origin check
-//   origin: function (origin, callback) {
-//     const origins = getOrigins();
-    
-//     // Allow requests with no origin (like mobile apps or curl requests)
-//     if (!origin || origins.includes(origin)) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error('Not allowed by CORS'));
-//     }
-//   },
-  
-//   // Allow credentials (cookies, authorization headers)
-//   credentials: true,
-  
-//   // Allowed HTTP methods
-//   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  
-//   // Allowed request headers
-//   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  
-//   // Expose response headers to client
-//   exposedHeaders: ['Content-Length', 'X-Total-Count'],
-  
-//   // Browser cache preflight requests for 24 hours
-//   maxAge: 86400,
-  
-//   // Allow same site requests
-//   optionsSuccessStatus: 200,
-// };
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin, such as Postman or mobile clients
+    if (!origin) {
+      return callback(null, true);
+    }
 
-// module.exports = cors(corsOptions);
+    const allowed = getAllowedOrigins();
+    if (allowed.includes(origin) || allowed.includes(origin.replace(/\/$/, ""))) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Not allowed by CORS: ${origin}`));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+};
+
+module.exports = { corsOptions, getAllowedOrigins };

@@ -9,6 +9,7 @@ import {
   Tag,
   CheckCircle2,
   History,
+  RotateCcw,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -28,6 +29,7 @@ const Item = () => {
     fetchSingleItem,
     removeItem,
     consumeItem,
+    restoreConsumedItem,
     editItem,
   } = useItems();
   const [editing, setEditing] = useState(false);
@@ -282,6 +284,20 @@ const handleDelete = async () => {
     navigate("/history");
   };
 
+  const handleRestore = async () => {
+    try {
+      setActionLoading(true);
+      setActionError("");
+      await restoreConsumedItem(item._id);
+    } catch (requestError) {
+      setActionError(
+        requestError.response?.data?.message || "Failed to restore item",
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   // UI
 
   return (
@@ -464,18 +480,25 @@ const handleDelete = async () => {
         </div>
 
         <div className="mt-4 flex flex-col gap-2 sm:mt-6 sm:flex-row sm:gap-3">
-          <button
-            onClick={handleConsumed}
-            disabled={actionLoading || item.status === "consumed"}
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
-          >
-            <CheckCircle2 size={18} />
-            {item.status === "consumed"
-              ? "Already Consumed"
-              : actionLoading
-                ? "Updating..."
-                : "Mark as Consumed"}
-          </button>
+          {item.status === "consumed" ? (
+            <button
+              onClick={handleRestore}
+              disabled={actionLoading}
+              className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-60"
+            >
+              <RotateCcw size={18} />
+              {actionLoading ? "Restoring..." : "Restore to Inventory"}
+            </button>
+          ) : (
+            <button
+              onClick={handleConsumed}
+              disabled={actionLoading}
+              className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 disabled:opacity-60"
+            >
+              <CheckCircle2 size={18} />
+              {actionLoading ? "Updating..." : "Mark as Consumed"}
+            </button>
+          )}
 
           <button
             onClick={handleHistory}

@@ -32,7 +32,7 @@ const CategoryChart = ({ items = [], dashboard = {} }) => {
     };
   }, []);
 
-  const activeItems = items.filter((item) => item.status !== "consumed");
+  const activeItems = items.filter((item) => item.status !== "consumed" && !item.consumedAt);
 
   const categoryCount = activeItems.reduce((acc, item) => {
     acc[item.category] = (acc[item.category] || 0) + 1;
@@ -61,7 +61,7 @@ const CategoryChart = ({ items = [], dashboard = {} }) => {
       </h2>
 
       <p className="mb-4 text-sm text-gray-500">
-        Distribution of your inventory items · {dashboard.totalItems || items.length} total
+        Distribution of your inventory items · {dashboard?.totalItems ?? activeItems.length} total
       </p>
 
       <div className="h-[300px] w-full sm:h-[320px]">

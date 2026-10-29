@@ -20,6 +20,7 @@ const AISuggestion = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (loading) return;
 
     try {
       await getSuggestions({

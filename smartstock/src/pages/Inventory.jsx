@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Search, SlidersHorizontal, X, Package, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { categories, statuses } from "../assets/dummydata/constants";
 import Inventoryitem from "../components/Inventory/Inventoryitem";
@@ -7,6 +8,7 @@ import { useItems } from "../context/itemContext";
 import Loader from "../components/Loader";
 
 const Inventory = () => {
+  const navigate = useNavigate();
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("");
   const [sort, setSort] = useState("");
@@ -14,14 +16,15 @@ const Inventory = () => {
 
   const { items: allItems, loading, error } = useItems();
 
-  const items = allItems.filter((item) => {
-    if (item.status === "consumed" || item.status === "expired") return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const expiry = new Date(item.expiryDate);
-    expiry.setHours(0, 0, 0, 0);
-    return expiry >= today;
-  });
+  const items = useMemo(() => {
+    return allItems.filter((item) => {
+      if (status === "consumed") {
+        return item.status === "consumed" || Boolean(item.consumedAt);
+      }
+      // Critical inventory rule: Total Items must exclude consumed items
+      return item.status !== "consumed" && !item.consumedAt;
+    });
+  }, [allItems, status]);
 
   const filteredItems = useMemo(() => {
     let filtered = [...items];
@@ -40,7 +43,23 @@ const Inventory = () => {
 
     // STATUS
     if (status) {
-      filtered = filtered.filter((item) => item.status === status);
+      filtered = filtered.filter((item) => {
+        if (status === "expired") {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const expiry = new Date(item.expiryDate);
+          expiry.setHours(0, 0, 0, 0);
+          return item.status === "expired" || expiry < today;
+        }
+        if (status === "active") {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const expiry = new Date(item.expiryDate);
+          expiry.setHours(0, 0, 0, 0);
+          return (item.status === "active" || !item.status) && expiry >= today && !item.consumedAt;
+        }
+        return item.status === status;
+      });
     }
 
     // SORT

@@ -10,38 +10,44 @@ const savedRecipesSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      require: true,
+      required: true,
+      trim: true,
     },
     ingredients: {
       type: [String],
-      require: true,
+      required: true,
+      default: [],
     },
     steps: {
       type: [String],
-      require: true,
+      required: true,
+      default: [],
     },
     prepTime: {
       type: Number,
       required: true,
+      default: 20,
     },
     servings: {
       type: Number,
       required: true,
+      default: 2,
     },
     usesInventory: {
       type: Boolean,
-      required: true,
+      default: true,
     },
     inventoryItemsUsed: {
       type: [String],
-      require: true,
+      default: [],
     },
     missingIngredients: {
       type: [String],
-      require: true,
+      default: [],
     },
   },
   { timestamps: true },
 );
 
-module.exports = mongoose.model("sevedREcipes", savedRecipesSchema);
+// Register model with fallback compatibility
+module.exports = mongoose.models.SavedRecipe || mongoose.model("SavedRecipe", savedRecipesSchema, "savedrecipes");
